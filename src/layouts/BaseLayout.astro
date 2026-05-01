@@ -7,6 +7,7 @@ import SEO from '../components/SEO.astro';
 import JsonLd from '../components/JsonLd.astro';
 import { organizationLd, websiteLd } from '../lib/seo.ts';
 import '../styles/global.css';
+import '../styles/fonts.css';
 
 type ActivePage =
   | 'home'
@@ -45,11 +46,12 @@ const {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="/fonts/cormorant-400.woff2"
+      crossorigin
     />
 
     <link
