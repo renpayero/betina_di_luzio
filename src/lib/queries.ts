@@ -1,7 +1,19 @@
-import { and, asc, count, desc, eq, gte, lte, ne } from 'drizzle-orm';
+import {
+  and,
+  arrayOverlaps,
+  asc,
+  count,
+  desc,
+  eq,
+  gte,
+  ilike,
+  lte,
+  ne,
+  or,
+} from 'drizzle-orm';
 import { db } from '../db/client.ts';
-import { categories, products } from '../db/schema.ts';
-import type { Category, Product } from '../db/schema.ts';
+import { categories, products, productImages } from '../db/schema.ts';
+import type { Category, Product, ProductImage } from '../db/schema.ts';
 
 export async function getCategories(): Promise<Category[]> {
   return db.select().from(categories).orderBy(asc(categories.sortOrder));
@@ -20,6 +32,9 @@ export type ProductFilter = {
   categoryId?: string;
   minPrice?: number;
   maxPrice?: number;
+  colors?: string[];
+  sizes?: string[];
+  q?: string;
   sort?: 'featured' | 'new' | 'price-asc' | 'price-desc';
 };
 
@@ -35,6 +50,20 @@ export async function getProducts(
   }
   if (typeof filter.maxPrice === 'number') {
     conds.push(lte(products.price, filter.maxPrice));
+  }
+  if (filter.colors && filter.colors.length > 0) {
+    conds.push(arrayOverlaps(products.colors, filter.colors));
+  }
+  if (filter.sizes && filter.sizes.length > 0) {
+    conds.push(arrayOverlaps(products.sizes, filter.sizes));
+  }
+  if (filter.q && filter.q.trim().length > 0) {
+    const needle = `%${filter.q.trim()}%`;
+    const qCond = or(
+      ilike(products.name, needle),
+      ilike(products.description, needle)
+    );
+    if (qCond) conds.push(qCond);
   }
 
   const order =
@@ -129,4 +158,75 @@ export async function getCategoryCounts(): Promise<Record<string, number>> {
 export async function getTotalProductCount(): Promise<number> {
   const [row] = await db.select({ n: count() }).from(products);
   return row?.n ?? 0;
+}
+
+export async function getProductImages(
+  productId: string
+): Promise<ProductImage[]> {
+  return db
+    .select()
+    .from(productImages)
+    .where(eq(productImages.productId, productId))
+    .orderBy(asc(productImages.sortOrder));
+}
+
+export async function getHeroImage(
+  productId: string
+): Promise<ProductImage | null> {
+  const [row] = await db
+    .select()
+    .from(productImages)
+    .where(
+      and(
+        eq(productImages.productId, productId),
+        eq(productImages.isHero, true)
+      )
+    )
+    .limit(1);
+  return row ?? null;
+}
+
+// ============================================================
+// Admin queries (only consumed from /admin/**)
+// ============================================================
+
+const LOW_STOCK_THRESHOLD = 3;
+
+export async function getAdminProductCount(): Promise<number> {
+  const [row] = await db.select({ n: count() }).from(products);
+  return row?.n ?? 0;
+}
+
+export type LowStockItem = Pick<Product, 'id' | 'slug' | 'name' | 'stock'>;
+
+export async function getAdminLowStock(
+  threshold: number = LOW_STOCK_THRESHOLD
+): Promise<LowStockItem[]> {
+  return db
+    .select({
+      id: products.id,
+      slug: products.slug,
+      name: products.name,
+      stock: products.stock,
+    })
+    .from(products)
+    .where(lte(products.stock, threshold))
+    .orderBy(asc(products.stock), asc(products.name));
+}
+
+export type TopValueItem = Pick<Product, 'id' | 'slug' | 'name' | 'price'>;
+
+export async function getAdminTopValueProducts(
+  limit = 5
+): Promise<TopValueItem[]> {
+  return db
+    .select({
+      id: products.id,
+      slug: products.slug,
+      name: products.name,
+      price: products.price,
+    })
+    .from(products)
+    .orderBy(desc(products.price))
+    .limit(limit);
 }

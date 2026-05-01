@@ -7,6 +7,7 @@ import {
   getProducts,
   type ProductFilter,
 } from '../lib/queries.ts';
+import { colorName } from '../lib/colors.ts';
 
 const url = Astro.url;
 const cat = url.searchParams.get('cat') ?? 'all';
@@ -16,6 +17,11 @@ const sortParam = (url.searchParams.get('sort') ?? 'featured') as
   | 'new'
   | 'price-asc'
   | 'price-desc';
+
+const colorsParam: string[] =
+  url.searchParams.get('colors')?.split(',').filter(Boolean) ?? [];
+const sizesParam: string[] =
+  url.searchParams.get('sizes')?.split(',').filter(Boolean) ?? [];
 
 const PRICE_RANGES: Record<string, [number, number]> = {
   '0-40000': [0, 40000],
@@ -31,6 +37,8 @@ if (priceParam && PRICE_RANGES[priceParam]) {
   filter.minPrice = mn;
   filter.maxPrice = mx;
 }
+if (colorsParam.length > 0) filter.colors = colorsParam;
+if (sizesParam.length > 0) filter.sizes = sizesParam;
 
 const [allCategories, counts, list, totalProducts] = await Promise.all([
   getCategories(),
@@ -48,14 +56,30 @@ const buildUrl = (params: Record<string, string | null>): string => {
   return u.pathname + (u.search || '');
 };
 
-const SWATCHES = [
+const toggleInList = (list: string[], value: string): string[] =>
+  list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
+
+const buildToggleUrl = (key: 'colors' | 'sizes', value: string): string => {
+  const current = key === 'colors' ? colorsParam : sizesParam;
+  const next = toggleInList(current, value);
+  return buildUrl({ [key]: next.length > 0 ? next.join(',') : null });
+};
+
+const hasActiveFilters =
+  cat !== 'all' ||
+  !!priceParam ||
+  colorsParam.length > 0 ||
+  sizesParam.length > 0 ||
+  sortParam !== 'featured';
+
+const SWATCHES: ReadonlyArray<readonly [string, string]> = [
   ['#CB674C', 'Terracota'],
   ['#36160E', 'Tinta'],
   ['#FCF5F4', 'Crema'],
   ['#6C95B0', 'Azul polvo'],
   ['#595421', 'Olivo'],
   ['#DBD7D3', 'Crudo'],
-];
+] as const;
 
 const SIZES = [
   ['S', 8],
@@ -115,31 +139,49 @@ const SIZES = [
       </div>
 
       <div class="filter-group">
-        <h5>Color</h5>
-        <div class="swatches-list">
+        <h5 id="filter-color">Color</h5>
+        <div
+          class="swatches-list"
+          role="group"
+          aria-labelledby="filter-color"
+        >
           {
-            SWATCHES.map(([hex, name]) => (
-              <button
-                class="swatch-btn"
-                style={`background:${hex}`}
-                title={name}
-                type="button"
-              />
-            ))
+            SWATCHES.map(([hex, name]) => {
+              const isOn = colorsParam.includes(hex);
+              return (
+                <a
+                  class:list={['swatch-btn', { active: isOn }]}
+                  style={`background:${hex}`}
+                  href={buildToggleUrl('colors', hex)}
+                  aria-label={`${colorName(hex)}${isOn ? ' (seleccionado)' : ''}`}
+                  aria-pressed={isOn ? 'true' : 'false'}
+                  title={name}
+                  data-no-prefetch
+                />
+              );
+            })
           }
         </div>
       </div>
 
       <div class="filter-group">
-        <h5>Talle</h5>
-        <ul>
+        <h5 id="filter-size">Talle</h5>
+        <ul role="group" aria-labelledby="filter-size">
           {
-            SIZES.map(([s, n]) => (
-              <li class="filter-static">
-                {s}
-                <span class="count">{n}</span>
-              </li>
-            ))
+            SIZES.map(([s, n]) => {
+              const isOn = sizesParam.includes(s);
+              return (
+                <li class:list={['filter-link', { active: isOn }]}>
+                  <a
+                    href={buildToggleUrl('sizes', s)}
+                    aria-pressed={isOn ? 'true' : 'false'}
+                  >
+                    {s}
+                    <span class="count">{n}</span>
+                  </a>
+                </li>
+              );
+            })
           }
         </ul>
       </div>
@@ -173,10 +215,29 @@ const SIZES = [
 
     <section aria-label="Productos">
       <div class="shop-toolbar">
-        <div class="count">{list.length} piezas</div>
+        <div class="toolbar-left">
+          <span class="count">{list.length} piezas</span>
+          {
+            hasActiveFilters && (
+              <a class="clear-filters" href="/tienda">
+                Limpiar filtros
+              </a>
+            )
+          }
+        </div>
         <form method="get" id="sort-form">
           {cat !== 'all' && <input type="hidden" name="cat" value={cat} />}
           {priceParam && <input type="hidden" name="price" value={priceParam} />}
+          {
+            colorsParam.length > 0 && (
+              <input type="hidden" name="colors" value={colorsParam.join(',')} />
+            )
+          }
+          {
+            sizesParam.length > 0 && (
+              <input type="hidden" name="sizes" value={sizesParam.join(',')} />
+            )
+          }
           <select name="sort" id="sort">
             <option value="featured" selected={sortParam === 'featured'}
               >Destacados primero</option
@@ -301,14 +362,33 @@ const SIZES = [
     gap: 10px;
   }
   .swatch-btn {
+    display: inline-block;
     width: 28px;
     height: 28px;
     border-radius: 50%;
     border: 1px solid var(--line);
-    transition: transform 0.2s;
+    transition: transform 0.2s, box-shadow 0.2s, outline-color 0.2s;
+    cursor: pointer;
+    position: relative;
   }
   .swatch-btn:hover {
     transform: scale(1.15);
+  }
+  .swatch-btn.active {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent-deep);
+  }
+  .swatch-btn.active::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M5 12.5l4.5 4.5L19 7' fill='none' stroke='%23FCF5F4' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 70%;
+    mix-blend-mode: difference;
+    pointer-events: none;
   }
 
   .shop-toolbar {
@@ -316,6 +396,12 @@ const SIZES = [
     justify-content: space-between;
     align-items: center;
     margin-bottom: 32px;
+    gap: 16px;
+  }
+  .shop-toolbar .toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
   }
   .shop-toolbar .count {
     font-family: var(--mono);
@@ -323,6 +409,19 @@ const SIZES = [
     color: var(--ink-soft);
     text-transform: uppercase;
     letter-spacing: 0.12em;
+  }
+  .shop-toolbar .clear-filters {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--accent-deep);
+    border-bottom: 1px solid currentColor;
+    padding-bottom: 1px;
+    transition: color 0.2s;
+  }
+  .shop-toolbar .clear-filters:hover {
+    color: var(--ink);
   }
   .shop-toolbar select {
     padding: 10px 14px;
