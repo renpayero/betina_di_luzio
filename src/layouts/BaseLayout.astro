@@ -1,0 +1,124 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import WhatsappFloat from '../components/WhatsappFloat.astro';
+import SEO from '../components/SEO.astro';
+import JsonLd from '../components/JsonLd.astro';
+import { organizationLd, websiteLd } from '../lib/seo.ts';
+import '../styles/global.css';
+
+type ActivePage =
+  | 'home'
+  | 'tienda'
+  | 'nosotros'
+  | 'contacto'
+  | 'cuidados'
+  | 'login'
+  | 'carrito';
+
+interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+  type?: 'website' | 'product' | 'article';
+  active?: ActivePage;
+  hideChrome?: boolean;
+  noindex?: boolean;
+}
+
+const {
+  title,
+  description,
+  image,
+  type = 'website',
+  active,
+  hideChrome = false,
+  noindex = false,
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+    />
+
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='10' fill='%23CB674C'/%3E%3Ctext x='12' y='17' text-anchor='middle' fill='%23FCF5F4' font-family='Georgia,serif' font-size='14' font-style='italic'%3EB%3C/text%3E%3C/svg%3E"
+    />
+
+    <SEO
+      title={title}
+      description={description}
+      image={image}
+      type={type}
+      noindex={noindex}
+    >
+      <slot name="head" />
+    </SEO>
+
+    <JsonLd data={[organizationLd(), websiteLd()]} />
+
+    <ClientRouter fallback="swap" />
+  </head>
+  <body data-active={active}>
+    <a href="#main" class="skip-link">Saltar al contenido</a>
+
+    {!hideChrome && <Nav active={active} />}
+
+    {
+      hideChrome ? (
+        <slot />
+      ) : (
+        <main id="main" tabindex="-1">
+          <slot />
+        </main>
+      )
+    }
+
+    {!hideChrome && <Footer />}
+    {!hideChrome && <WhatsappFloat />}
+
+    <script>
+      import { initCursor } from '../scripts/cursor.ts';
+      import {
+        initReveal,
+        initNavScroll,
+        initCounters,
+      } from '../scripts/reveal.ts';
+      import { cart } from '../lib/cart.ts';
+
+      const updateCartBadge = () => {
+        const c = cart.count();
+        document
+          .querySelectorAll<HTMLElement>('[data-cart-count]')
+          .forEach((el) => {
+            el.textContent = String(c);
+            el.style.display = c > 0 ? 'flex' : 'none';
+          });
+      };
+
+      const init = () => {
+        initCursor();
+        initReveal();
+        initNavScroll();
+        initCounters();
+        updateCartBadge();
+      };
+
+      document.addEventListener('astro:page-load', init);
+      window.addEventListener('bdl-cart-change', updateCartBadge);
+    </script>
+  </body>
+</html>

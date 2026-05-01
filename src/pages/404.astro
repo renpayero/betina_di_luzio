@@ -1,0 +1,58 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Página no encontrada" description="La página que buscás no existe o se mudó." noindex>
+  <main id="main" class="not-found">
+    <div class="eyebrow">— 404</div>
+    <h1 class="serif">Algo se <em>descosió.</em></h1>
+    <p>
+      La página que buscás no existe o se mudó. Volvé al inicio o explorá la
+      tienda — siempre hay algo lindo esperándote.
+    </p>
+    <div class="actions">
+      <a href="/" class="btn btn-primary">Volver al inicio</a>
+      <a href="/tienda" class="btn btn-secondary">Ver tienda</a>
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  .not-found {
+    min-height: 70vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 160px 24px 80px;
+    gap: 16px;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  .not-found .eyebrow {
+    color: var(--accent-deep);
+  }
+  .not-found h1 {
+    font-size: var(--t-display);
+    line-height: 0.95;
+  }
+  .not-found h1 em {
+    font-style: italic;
+    color: var(--accent-deep);
+  }
+  .not-found p {
+    font-family: var(--serif);
+    font-style: italic;
+    color: var(--ink-soft);
+    font-size: 22px;
+    max-width: 560px;
+  }
+  .actions {
+    display: flex;
+    gap: 16px;
+    margin-top: 32px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+</style>

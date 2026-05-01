@@ -1,0 +1,16 @@
+---
+import type { JsonLd } from '../lib/seo.ts';
+
+interface Props {
+  data: JsonLd | JsonLd[];
+}
+
+const { data } = Astro.props;
+const payload = JSON.stringify(data);
+---
+
+<script
+  type="application/ld+json"
+  is:inline
+  set:html={payload}
+/>

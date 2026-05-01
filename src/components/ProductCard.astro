@@ -1,0 +1,79 @@
+---
+import type { Product } from '../db/schema.ts';
+import { fmtARS } from '../lib/format.ts';
+import PlaceholderImg from './PlaceholderImg.astro';
+
+interface Props {
+  product: Product;
+  showQuick?: boolean;
+  delay?: 0 | 1 | 2 | 3;
+}
+
+const { product: p, showQuick = false, delay } = Astro.props;
+const badgeText =
+  p.status === 'new'
+    ? 'Nuevo'
+    : p.status === 'sale'
+      ? 'Oferta'
+      : p.status === 'bestseller'
+        ? 'Best seller'
+        : null;
+
+const revealClass =
+  delay !== undefined ? `reveal reveal-delay-${delay}` : 'reveal';
+---
+
+<a href={`/producto/${p.slug}`} class={`product-card ${revealClass}`}>
+  <div class="card-img">
+    {
+      p.status && badgeText && (
+        <span class={`badge ${p.status}`}>{badgeText}</span>
+      )
+    }
+    <button class="fav-btn" data-fav-toggle aria-label="Favorito" type="button">
+      <svg viewBox="0 0 24 24"
+        ><path
+          d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+        ></path></svg
+      >
+    </button>
+    <PlaceholderImg label={p.placeholder} />
+    {
+      showQuick && (
+        <button class="quick" type="button">
+          Vista rápida →
+        </button>
+      )
+    }
+  </div>
+  <h4>{p.name}</h4>
+  <div class="meta">
+    <span>
+      {p.oldPrice && <span class="old-price">{fmtARS(p.oldPrice)}</span>}
+      <span class="price">{fmtARS(p.price)}</span>
+    </span>
+    <span class="colors">
+      {
+        p.colors.map((c: string) => (
+          <span class="swatch" style={`background:${c}`} />
+        ))
+      }
+    </span>
+  </div>
+</a>
+
+<script>
+  const handler = (e: Event) => {
+    const btn = (e.target as HTMLElement).closest<HTMLButtonElement>(
+      '[data-fav-toggle]'
+    );
+    if (!btn) return;
+    e.preventDefault();
+    e.stopPropagation();
+    btn.classList.toggle('fav-active');
+  };
+  document.addEventListener('astro:page-load', () => {
+    document.removeEventListener('click', handler);
+    document.addEventListener('click', handler);
+  });
+</script>

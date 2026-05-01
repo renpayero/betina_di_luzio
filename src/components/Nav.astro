@@ -1,0 +1,69 @@
+---
+import { BRAND } from '../lib/constants.ts';
+
+interface Props {
+  active?:
+    | 'home'
+    | 'tienda'
+    | 'nosotros'
+    | 'contacto'
+    | 'cuidados'
+    | 'login'
+    | 'carrito';
+}
+const { active } = Astro.props;
+const isActive = (key: NonNullable<Props['active']>) =>
+  active === key ? 'page' : undefined;
+---
+
+<nav
+  class="nav"
+  aria-label="Navegación principal"
+  transition:persist="main-nav"
+>
+  <a href="/" class="nav-brand" aria-label={`${BRAND.name} — Inicio`}>
+    <span>Betina<span class="ampersand"> · </span>Di Luzio</span>
+    <small>Tejidos · 2011</small>
+  </a>
+  <ul class="nav-links">
+    <li><a href="/" aria-current={isActive('home')}>Inicio</a></li>
+    <li><a href="/tienda" aria-current={isActive('tienda')}>Tienda</a></li>
+    <li><a href="/nosotros" aria-current={isActive('nosotros')}>Nosotros</a></li>
+    <li><a href="/cuidados" aria-current={isActive('cuidados')}>Cuidados</a></li>
+    <li><a href="/contacto" aria-current={isActive('contacto')}>Contacto</a></li>
+  </ul>
+  <div class="nav-actions">
+    <a href="/login" class="icon-btn" aria-label="Ingresar al panel">
+      <svg
+        class="nav-icon"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+        focusable="false"
+        ><circle cx="12" cy="8" r="4"></circle><path
+          d="M4 20c0-4 4-7 8-7s8 3 8 7"></path></svg
+      >
+    </a>
+    <a
+      href="/carrito"
+      class="icon-btn"
+      aria-label="Ver carrito"
+      aria-current={isActive('carrito')}
+    >
+      <svg
+        class="nav-icon"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+        focusable="false"
+        ><path d="M6 7h12l-1.5 11.5a2 2 0 0 1-2 1.5h-5a2 2 0 0 1-2-1.5L6 7z"
+        ></path><path d="M9 7V5a3 3 0 0 1 6 0v2"></path></svg
+      >
+      <span
+        class="cart-count"
+        data-cart-count
+        style="display:none"
+        aria-live="polite"
+        aria-atomic="true">0</span
+      >
+    </a>
+  </div>
+</nav>

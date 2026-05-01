@@ -1,0 +1,38 @@
+---
+interface Props {
+  items?: string[];
+}
+const {
+  items = [
+    'Cada prenda es única',
+    'Hecho en Rosario',
+    'Tejido a mano',
+    'Lana natural',
+    'Desde 2011',
+    'A medida',
+  ],
+} = Astro.props;
+---
+
+<div class="marquee">
+  <div class="marquee-track">
+    <span>
+      {
+        items.map((it) => (
+          <Fragment>
+            <span>{it}</span> <span class="dot" />{' '}
+          </Fragment>
+        ))
+      }
+    </span>
+    <span>
+      {
+        items.map((it) => (
+          <Fragment>
+            <span>{it}</span> <span class="dot" />{' '}
+          </Fragment>
+        ))
+      }
+    </span>
+  </div>
+</div>

@@ -1,0 +1,368 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import {
+  getCategories,
+  getCategoryCounts,
+  getProducts,
+  type ProductFilter,
+} from '../lib/queries.ts';
+
+const url = Astro.url;
+const cat = url.searchParams.get('cat') ?? 'all';
+const priceParam = url.searchParams.get('price');
+const sortParam = (url.searchParams.get('sort') ?? 'featured') as
+  | 'featured'
+  | 'new'
+  | 'price-asc'
+  | 'price-desc';
+
+const PRICE_RANGES: Record<string, [number, number]> = {
+  '0-40000': [0, 40000],
+  '40000-80000': [40000, 80000],
+  '80000-120000': [80000, 120000],
+  '120000-999999': [120000, 999_999],
+};
+
+const filter: ProductFilter = { sort: sortParam };
+if (cat !== 'all') filter.categoryId = cat;
+if (priceParam && PRICE_RANGES[priceParam]) {
+  const [mn, mx] = PRICE_RANGES[priceParam];
+  filter.minPrice = mn;
+  filter.maxPrice = mx;
+}
+
+const [allCategories, counts, list, totalProducts] = await Promise.all([
+  getCategories(),
+  getCategoryCounts(),
+  getProducts(filter),
+  getProducts({}).then((p) => p.length),
+]);
+
+const buildUrl = (params: Record<string, string | null>): string => {
+  const u = new URL(url);
+  for (const [k, v] of Object.entries(params)) {
+    if (v === null) u.searchParams.delete(k);
+    else u.searchParams.set(k, v);
+  }
+  return u.pathname + (u.search || '');
+};
+
+const SWATCHES = [
+  ['#CB674C', 'Terracota'],
+  ['#36160E', 'Tinta'],
+  ['#FCF5F4', 'Crema'],
+  ['#6C95B0', 'Azul polvo'],
+  ['#595421', 'Olivo'],
+  ['#DBD7D3', 'Crudo'],
+];
+
+const SIZES = [
+  ['S', 8],
+  ['M', 12],
+  ['L', 10],
+  ['Único', 6],
+  ['Bebé', 9],
+] as const;
+---
+
+<BaseLayout
+  title="Tienda"
+  description="Tejidos artesanales hechos a mano: sweaters, cardigans, mantas, accesorios y más. Cada prenda es única."
+  active="tienda"
+>
+  <header class="shop-header">
+    <div class="container">
+      <div>
+        <div class="eyebrow" style="margin-bottom: 16px;">— Tienda</div>
+        <h1 class="serif">
+          Tejidos<br />
+          <em style="color: var(--accent-deep); font-style: italic;"
+            >a tu medida</em
+          >.
+        </h1>
+      </div>
+      <p>
+        Cada prenda es única. Si no encontrás tu talle o querés otro color,
+        escribime y lo tejo para vos.
+      </p>
+    </div>
+  </header>
+
+  <div class="shop-layout">
+    <aside class="filters" aria-label="Filtros de productos">
+      <div class="filter-group">
+        <h5>Categorías</h5>
+        <ul>
+          <li class:list={['filter-link', { active: cat === 'all' }]}>
+            <a href={buildUrl({ cat: null })}>
+              Todos<span class="count">{totalProducts}</span>
+            </a>
+          </li>
+          {
+            allCategories.map((c) => (
+              <li
+                class:list={['filter-link', { active: cat === c.id }]}
+              >
+                <a href={buildUrl({ cat: c.id })}>
+                  {c.name}
+                  <span class="count">{counts[c.id] ?? 0}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <div class="filter-group">
+        <h5>Color</h5>
+        <div class="swatches-list">
+          {
+            SWATCHES.map(([hex, name]) => (
+              <button
+                class="swatch-btn"
+                style={`background:${hex}`}
+                title={name}
+                type="button"
+              />
+            ))
+          }
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <h5>Talle</h5>
+        <ul>
+          {
+            SIZES.map(([s, n]) => (
+              <li class="filter-static">
+                {s}
+                <span class="count">{n}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <div class="filter-group">
+        <h5>Precio</h5>
+        <ul>
+          {
+            (
+              [
+                ['0-40000', 'Hasta $40.000'],
+                ['40000-80000', '$40 — $80.000'],
+                ['80000-120000', '$80 — $120.000'],
+                ['120000-999999', '+ $120.000'],
+              ] as const
+            ).map(([key, label]) => (
+              <li class:list={['filter-link', { active: priceParam === key }]}>
+                <a
+                  href={buildUrl({
+                    price: priceParam === key ? null : key,
+                  })}
+                >
+                  {label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </aside>
+
+    <section aria-label="Productos">
+      <div class="shop-toolbar">
+        <div class="count">{list.length} piezas</div>
+        <form method="get" id="sort-form">
+          {cat !== 'all' && <input type="hidden" name="cat" value={cat} />}
+          {priceParam && <input type="hidden" name="price" value={priceParam} />}
+          <select name="sort" id="sort">
+            <option value="featured" selected={sortParam === 'featured'}
+              >Destacados primero</option
+            >
+            <option value="new" selected={sortParam === 'new'}>Más nuevos</option>
+            <option value="price-asc" selected={sortParam === 'price-asc'}
+              >Precio: menor a mayor</option
+            >
+            <option value="price-desc" selected={sortParam === 'price-desc'}
+              >Precio: mayor a menor</option
+            >
+          </select>
+        </form>
+      </div>
+      {
+        list.length === 0 ? (
+          <div class="empty">
+            <p class="serif" style="font-size: 28px; font-style: italic;">
+              No encontramos piezas con esos filtros.
+            </p>
+            <a href="/tienda" class="btn btn-secondary" style="margin-top: 24px;">
+              Ver toda la tienda
+            </a>
+          </div>
+        ) : (
+          <div class="products-grid">
+            {list.map((p) => (
+              <ProductCard product={p} />
+            ))}
+          </div>
+        )
+      }
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .shop-header {
+    padding: 160px 0 60px;
+    background: var(--bg-warm);
+    border-bottom: 1px solid var(--line);
+  }
+  .shop-header :global(.container) {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: end;
+  }
+  .shop-header h1 {
+    font-size: var(--t-h1);
+  }
+  .shop-header p {
+    color: var(--ink-soft);
+    max-width: 480px;
+  }
+  @media (max-width: 800px) {
+    .shop-header :global(.container) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .shop-layout {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 48px;
+    padding: 48px var(--s-7);
+    max-width: 1440px;
+    margin: 0 auto;
+  }
+  .filters {
+    position: sticky;
+    top: 100px;
+    align-self: flex-start;
+  }
+  .filter-group {
+    margin-bottom: 36px;
+  }
+  .filter-group h5 {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--ink-soft);
+    margin-bottom: 16px;
+  }
+  .filter-group ul {
+    list-style: none;
+  }
+  .filter-link,
+  .filter-static {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--line-soft);
+    transition: padding-left 0.3s, color 0.2s;
+  }
+  .filter-link a {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+  .filter-link:hover {
+    color: var(--accent-deep);
+    padding-left: 6px;
+  }
+  .filter-link.active {
+    color: var(--accent-deep);
+    font-weight: 500;
+  }
+  .filter-static {
+    display: flex;
+    justify-content: space-between;
+    color: var(--ink-soft);
+  }
+  .filter-group .count {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-mute);
+  }
+
+  .swatches-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .swatch-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    transition: transform 0.2s;
+  }
+  .swatch-btn:hover {
+    transform: scale(1.15);
+  }
+
+  .shop-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+  }
+  .shop-toolbar .count {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+  .shop-toolbar select {
+    padding: 10px 14px;
+    font: inherit;
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+  }
+
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--s-5);
+  }
+  .empty {
+    padding: 80px 20px;
+    text-align: center;
+  }
+
+  @media (max-width: 1100px) {
+    .products-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 800px) {
+    .shop-layout {
+      grid-template-columns: 1fr;
+    }
+    .filters {
+      position: static;
+    }
+  }
+</style>
+
+<script>
+  const wireSort = () => {
+    const form = document.getElementById('sort-form') as HTMLFormElement | null;
+    const select = document.getElementById('sort') as HTMLSelectElement | null;
+    if (!form || !select) return;
+    select.addEventListener('change', () => form.submit());
+  };
+  document.addEventListener('astro:page-load', wireSort);
+</script>

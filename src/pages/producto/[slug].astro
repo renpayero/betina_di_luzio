@@ -1,0 +1,467 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PlaceholderImg from '../../components/PlaceholderImg.astro';
+import ProductCard from '../../components/ProductCard.astro';
+import JsonLd from '../../components/JsonLd.astro';
+import {
+  getCategoryById,
+  getProductBySlug,
+  getRelatedProducts,
+} from '../../lib/queries.ts';
+import { fmtARS, calcDiscount } from '../../lib/format.ts';
+import { colorName } from '../../lib/colors.ts';
+import { WHATSAPP_NUMBER, waLink } from '../../lib/constants.ts';
+import { breadcrumbLd, productLd } from '../../lib/seo.ts';
+
+const { slug } = Astro.params;
+if (!slug) return Astro.redirect('/tienda');
+
+const product = await getProductBySlug(slug);
+if (!product) {
+  return new Response(null, { status: 404 });
+}
+
+const [category, related] = await Promise.all([
+  getCategoryById(product.categoryId),
+  getRelatedProducts(product.id, product.categoryId, 4),
+]);
+
+const statusLabel =
+  product.status === 'new'
+    ? 'Nuevo'
+    : product.status === 'sale'
+      ? 'En oferta'
+      : product.status === 'bestseller'
+        ? 'Más vendido'
+        : null;
+
+const galleryThumbs = [
+  'Vista frontal',
+  'Detalle del punto',
+  'Modelo en uso',
+  'Espalda',
+];
+const initialColor = product.colors[0] ?? '#CB674C';
+const initialSize = product.sizes[0] ?? 'Único';
+const lowStock = product.stock <= 3;
+const stockMsg = lowStock ? `Sólo ${product.stock} disponibles` : 'En stock';
+const stockColor = lowStock ? 'var(--accent-deep)' : 'var(--ink-soft)';
+
+const trail = [
+  { name: 'Inicio', url: '/' },
+  { name: 'Tienda', url: '/tienda' },
+];
+if (category) {
+  trail.push({ name: category.name, url: `/tienda?cat=${category.id}` });
+}
+trail.push({ name: product.name, url: `/producto/${product.slug}` });
+---
+
+<BaseLayout
+  title={product.name}
+  description={product.description}
+  type="product"
+  active="tienda"
+>
+  <Fragment slot="head">
+    <JsonLd data={[productLd(product, category?.name ?? ''), breadcrumbLd(trail)]} />
+  </Fragment>
+
+  <div class="pdp">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="/">Inicio</a> · <a href="/tienda">Tienda</a> ·
+      <span>{category?.name ?? ''}</span> ·
+      <span aria-current="page">{product.name}</span>
+    </nav>
+
+    <div class="pdp-grid">
+      <div class="gallery">
+        <div class="gallery-thumbs" role="tablist" aria-label="Galería de imágenes">
+          {
+            galleryThumbs.map((label, i) => {
+              const c = product.colors[i % product.colors.length] ?? '#CB674C';
+              const grad = `linear-gradient(135deg, ${c}40, ${c}90)`;
+              return (
+                <button
+                  type="button"
+                  class:list={['thumb', { active: i === 0 }]}
+                  data-thumb-idx={i}
+                  role="tab"
+                  aria-selected={i === 0 ? 'true' : 'false'}
+                  aria-label={label}
+                >
+                  <PlaceholderImg
+                    label={label}
+                    gradient={grad}
+                    labelStyle="font-size:9px"
+                  />
+                </button>
+              );
+            })
+          }
+        </div>
+        <div class="gallery-main" role="tabpanel" aria-live="polite">
+          <PlaceholderImg label={product.placeholder} />
+        </div>
+      </div>
+
+      <div
+        class="pdp-info"
+        data-product-id={product.id}
+        data-product-slug={product.slug}
+        data-product-name={product.name}
+        data-product-price={product.price}
+        data-product-placeholder={product.placeholder}
+        data-wa={WHATSAPP_NUMBER}
+      >
+        {statusLabel && <div class="eyebrow">— {statusLabel}</div>}
+        <h1 class="serif">{product.name}</h1>
+        <div class="price-row">
+          <span class="price" aria-label={`Precio: ${fmtARS(product.price)}`}>
+            {fmtARS(product.price)}
+          </span>
+          {
+            product.oldPrice && (
+              <>
+                <span
+                  class="old"
+                  aria-label={`Precio anterior: ${fmtARS(product.oldPrice)}`}
+                >
+                  {fmtARS(product.oldPrice)}
+                </span>
+                <span class="mono" style="color:var(--accent-deep);">
+                  −{calcDiscount(product.price, product.oldPrice)}%
+                </span>
+              </>
+            )
+          }
+        </div>
+        <p class="desc">{product.description}</p>
+
+        <div class="option-block">
+          <h2 class="option-h">
+            <span>Color</span>
+            <span class="selected" id="sel-color">{colorName(initialColor)}</span>
+          </h2>
+          <div class="colors-row" id="colors-row" role="radiogroup" aria-label="Color">
+            {
+              product.colors.map((c: string, i: number) => (
+                <button
+                  class:list={['color-opt', { active: i === 0 }]}
+                  style={`background:${c}`}
+                  data-color={c}
+                  type="button"
+                  role="radio"
+                  aria-checked={i === 0 ? 'true' : 'false'}
+                  aria-label={colorName(c)}
+                />
+              ))
+            }
+          </div>
+        </div>
+
+        <div class="option-block">
+          <h2 class="option-h">
+            <span>Talle</span>
+            <span class="selected" id="sel-size">{initialSize}</span>
+          </h2>
+          <div class="sizes-row" id="sizes-row" role="radiogroup" aria-label="Talle">
+            {
+              product.sizes.map((s: string, i: number) => (
+                <button
+                  class:list={['size-opt', { active: i === 0 }]}
+                  data-size={s}
+                  type="button"
+                  role="radio"
+                  aria-checked={i === 0 ? 'true' : 'false'}
+                >
+                  {s}
+                </button>
+              ))
+            }
+          </div>
+        </div>
+
+        <div class="qty-row">
+          <span class="mono" style="color: var(--ink-soft);" id="qty-label">Cantidad</span>
+          <div class="qty-ctrl" role="group" aria-labelledby="qty-label">
+            <button id="qty-minus" type="button" aria-label="Disminuir cantidad">−</button>
+            <span id="qty" aria-live="polite">1</span>
+            <button id="qty-plus" type="button" data-stock={product.stock} aria-label="Aumentar cantidad">+</button>
+          </div>
+          <span class="mono stock-msg" style={`color: ${stockColor};`}>
+            {stockMsg}
+          </span>
+        </div>
+
+        <div class="add-row">
+          <button class="btn btn-primary" id="add-cart" type="button">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"
+              ><path d="M6 7h12l-1.5 11.5a2 2 0 0 1-2 1.5h-5a2 2 0 0 1-2-1.5L6 7z"></path><path d="M9 7V5a3 3 0 0 1 6 0v2"></path></svg
+            >
+            Agregar al carrito
+          </button>
+          <button class="btn-icon" type="button" aria-label="Agregar a favoritos" aria-pressed="false" data-fav>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true" focusable="false"
+              ><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg
+            >
+          </button>
+        </div>
+
+        <a href={waLink()} class="wa-pdp" id="wa-link" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"
+            ><path
+              d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 0 1 8.413 3.488 11.824 11.824 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24z"
+            ></path></svg
+          >
+          Consultar por WhatsApp
+        </a>
+
+        <p id="add-feedback" class="sr-only" aria-live="polite"></p>
+
+        <dl class="specs">
+          <div class="spec-item"><dt>Material</dt><dd>{product.materials}</dd></div>
+          <div class="spec-item"><dt>Tejido</dt><dd>A mano · 2 agujas / crochet</dd></div>
+          <div class="spec-item"><dt>Hecho en</dt><dd>Rosario, Santa Fe</dd></div>
+          <div class="spec-item"><dt>Tiempo</dt><dd>2 — 6 semanas</dd></div>
+          <div class="spec-item">
+            <dt>Cuidado</dt>
+            <dd><a href="/cuidados" class="care-link">Ver instrucciones</a></dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+
+    <section class="related" aria-labelledby="related-heading">
+      <h2 id="related-heading" class="serif">También te puede gustar</h2>
+      <div class="related-grid">
+        {related.map((rp) => <ProductCard product={rp} />)}
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .pdp { padding: 130px var(--s-7) var(--s-9); max-width: 1440px; margin: 0 auto; }
+  .breadcrumb { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--ink-soft); margin-bottom: 32px; }
+  .breadcrumb a:hover { color: var(--accent); }
+  .pdp-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 80px; align-items: start; }
+  .gallery { display: grid; grid-template-columns: 100px 1fr; gap: 16px; position: sticky; top: 110px; }
+  .gallery-thumbs { display: flex; flex-direction: column; gap: 12px; }
+  .gallery-thumbs .thumb {
+    aspect-ratio: 3 / 4;
+    opacity: 0.5;
+    transition: opacity 0.3s;
+    position: relative;
+    overflow: hidden;
+    padding: 0;
+  }
+  .gallery-thumbs .thumb.active { opacity: 1; }
+  .gallery-thumbs .thumb :global(.placeholder-img) { position: absolute; inset: 0; }
+  .gallery-main { aspect-ratio: 3 / 4; position: relative; overflow: hidden; }
+  .gallery-main :global(.placeholder-img) { position: absolute; inset: 0; }
+
+  .pdp-info h1 { font-size: var(--t-h2); margin: 16px 0 24px; line-height: 1.05; }
+  .pdp-info .price-row { display: flex; align-items: baseline; gap: 12px; margin-bottom: 32px; }
+  .pdp-info .price { font-family: var(--mono); font-size: 22px; }
+  .pdp-info .old { font-family: var(--mono); font-size: 14px; color: var(--ink-mute); text-decoration: line-through; }
+  .pdp-info .desc { font-family: var(--serif); font-size: 19px; line-height: 1.6; color: var(--ink-soft); margin-bottom: 32px; }
+
+  .option-block { margin-bottom: 28px; }
+  .option-h {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--ink-soft);
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    font-weight: 400;
+  }
+  .option-h .selected { color: var(--ink); font-weight: 500; }
+
+  .colors-row { display: flex; gap: 12px; }
+  .color-opt {
+    width: 40px; height: 40px; border-radius: 50%;
+    position: relative; border: 1px solid var(--line);
+    transition: transform 0.2s;
+  }
+  .color-opt:hover { transform: scale(1.1); }
+  .color-opt.active::after,
+  .color-opt[aria-checked="true"]::after {
+    content: ''; position: absolute; inset: -5px;
+    border-radius: 50%; border: 1.5px solid var(--accent);
+  }
+
+  .sizes-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .size-opt {
+    padding: 12px 18px;
+    border: 1px solid var(--line); border-radius: 4px;
+    font-family: var(--mono); font-size: 12px;
+    transition: all 0.2s;
+  }
+  .size-opt:hover, .size-opt.active, .size-opt[aria-checked="true"] {
+    background: var(--ink); color: var(--bg); border-color: var(--ink);
+  }
+
+  .qty-row { display: flex; align-items: center; gap: 16px; margin-bottom: 32px; flex-wrap: wrap; }
+  .qty-ctrl { display: flex; align-items: center; gap: 0; border: 1px solid var(--line); border-radius: 4px; }
+  .qty-ctrl button { width: 40px; height: 44px; }
+  .qty-ctrl button:hover { background: var(--bg-warm); }
+  .qty-ctrl span { width: 40px; text-align: center; font-family: var(--mono); }
+
+  .add-row { display: flex; gap: 12px; margin-bottom: 24px; }
+  .add-row .btn-primary { flex: 1; justify-content: center; padding: 18px; }
+  .btn-icon {
+    width: 56px; height: 56px; border-radius: 999px;
+    border: 1px solid var(--ink);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .btn-icon:hover, .btn-icon[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+
+  .wa-pdp {
+    width: 100%; padding: 14px;
+    background: #25d366; color: white; border-radius: 999px;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    font-family: var(--mono); font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.18em; transition: background 0.2s;
+  }
+  .wa-pdp:hover { background: #1fb959; }
+  .wa-pdp svg { width: 16px; height: 16px; fill: currentColor; }
+
+  .specs { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 32px; }
+  .spec-item { display: flex; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid var(--line-soft); }
+  .spec-item dt { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--ink-soft); }
+  .spec-item dd { font-size: 14px; }
+  .care-link { text-decoration: underline; color: var(--accent-deep); }
+
+  .related { margin-top: 120px; }
+  .related h2 { font-size: var(--t-h2); margin-bottom: 48px; text-align: center; }
+  .related-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+
+  @media (max-width: 1000px) {
+    .pdp-grid { grid-template-columns: 1fr; }
+    .gallery { position: static; }
+    .related-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+
+<script>
+  import { cart } from '../../lib/cart.ts';
+  import { colorName } from '../../lib/colors.ts';
+
+  const init = () => {
+    const root = document.querySelector<HTMLElement>('.pdp-info');
+    if (!root) return;
+    const productId = root.dataset.productId!;
+    const productName = root.dataset.productName!;
+    const price = Number(root.dataset.productPrice ?? '0');
+    const placeholder = root.dataset.productPlaceholder ?? '';
+    const slug = root.dataset.productSlug ?? '';
+    const wa = root.dataset.wa ?? '';
+
+    let selColor =
+      root.querySelector<HTMLButtonElement>('.color-opt.active')?.dataset.color ?? '';
+    let selSize =
+      root.querySelector<HTMLButtonElement>('.size-opt.active')?.dataset.size ?? '';
+    let qty = 1;
+
+    const colorEl = document.getElementById('sel-color');
+    const sizeEl = document.getElementById('sel-size');
+    const qtyEl = document.getElementById('qty');
+    const waLinkEl = document.getElementById('wa-link') as HTMLAnchorElement | null;
+    const feedback = document.getElementById('add-feedback');
+
+    const refreshWa = () => {
+      if (!waLinkEl) return;
+      const txt = encodeURIComponent(
+        `Hola Betina! Me interesa ${productName} (${selSize} · ${colorName(selColor)}). ¿Está disponible?`
+      );
+      waLinkEl.href = `https://wa.me/${wa}?text=${txt}`;
+    };
+    refreshWa();
+
+    const setRadio = (group: NodeListOf<HTMLButtonElement>, target: HTMLButtonElement) => {
+      group.forEach((b) => {
+        b.classList.toggle('active', b === target);
+        b.setAttribute('aria-checked', b === target ? 'true' : 'false');
+      });
+    };
+
+    const colorBtns = document.querySelectorAll<HTMLButtonElement>('.color-opt');
+    colorBtns.forEach((b) => {
+      b.addEventListener('click', () => {
+        setRadio(colorBtns, b);
+        selColor = b.dataset.color ?? '';
+        if (colorEl) colorEl.textContent = colorName(selColor);
+        refreshWa();
+      });
+    });
+
+    const sizeBtns = document.querySelectorAll<HTMLButtonElement>('.size-opt');
+    sizeBtns.forEach((b) => {
+      b.addEventListener('click', () => {
+        setRadio(sizeBtns, b);
+        selSize = b.dataset.size ?? '';
+        if (sizeEl) sizeEl.textContent = selSize;
+        refreshWa();
+      });
+    });
+
+    const minus = document.getElementById('qty-minus');
+    const plus = document.getElementById('qty-plus') as HTMLButtonElement | null;
+    const stock = Number(plus?.dataset.stock ?? '99');
+    minus?.addEventListener('click', () => {
+      if (qty > 1) qty--;
+      if (qtyEl) qtyEl.textContent = String(qty);
+    });
+    plus?.addEventListener('click', () => {
+      if (qty < stock) qty++;
+      if (qtyEl) qtyEl.textContent = String(qty);
+    });
+
+    document.querySelectorAll<HTMLButtonElement>('.thumb').forEach((t) => {
+      t.addEventListener('click', () => {
+        document.querySelectorAll('.thumb').forEach((x) => {
+          x.classList.remove('active');
+          x.setAttribute('aria-selected', 'false');
+        });
+        t.classList.add('active');
+        t.setAttribute('aria-selected', 'true');
+      });
+    });
+
+    const fav = document.querySelector<HTMLButtonElement>('[data-fav]');
+    fav?.addEventListener('click', () => {
+      const pressed = fav.getAttribute('aria-pressed') === 'true';
+      fav.setAttribute('aria-pressed', String(!pressed));
+    });
+
+    const addBtn = document.getElementById('add-cart') as HTMLButtonElement | null;
+    addBtn?.addEventListener('click', () => {
+      cart.add({
+        id: productId,
+        slug,
+        name: productName,
+        price,
+        color: selColor,
+        size: selSize,
+        qty,
+        placeholder,
+      });
+      const orig = addBtn.textContent;
+      addBtn.disabled = true;
+      addBtn.textContent = '✓ Agregado al carrito';
+      addBtn.style.background = 'var(--accent-olive)';
+      if (feedback) feedback.textContent = `${productName} agregado al carrito.`;
+      window.setTimeout(() => {
+        addBtn.disabled = false;
+        addBtn.textContent = orig;
+        addBtn.style.background = '';
+      }, 1800);
+    });
+  };
+
+  document.addEventListener('astro:page-load', init);
+</script>

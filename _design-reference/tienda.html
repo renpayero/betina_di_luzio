@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tienda · Betina Di Luzio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+<style>
+.shop-header {
+  padding: 160px 0 60px;
+  background: var(--bg-warm);
+  border-bottom: 1px solid var(--line);
+}
+.shop-header .container { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: end; }
+.shop-header h1 { font-size: var(--t-h1); }
+.shop-header p { color: var(--ink-soft); max-width: 480px; }
+@media (max-width: 800px) { .shop-header .container { grid-template-columns: 1fr; } }
+
+.shop-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 48px;
+  padding: 48px var(--s-7);
+  max-width: 1440px;
+  margin: 0 auto;
+}
+.filters { position: sticky; top: 100px; align-self: flex-start; }
+.filter-group { margin-bottom: 36px; }
+.filter-group h5 { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.18em; color: var(--ink-soft); margin-bottom: 16px; }
+.filter-group ul { list-style: none; }
+.filter-group li { padding: 8px 0; border-bottom: 1px solid var(--line-soft); display: flex; justify-content: space-between; cursor: none; transition: color 0.2s, padding-left 0.3s; }
+.filter-group li:hover { color: var(--accent-deep); padding-left: 6px; }
+.filter-group li.active { color: var(--accent-deep); font-weight: 500; }
+.filter-group li .count { font-family: var(--mono); font-size: 11px; color: var(--ink-mute); }
+
+.swatches-list { display: flex; flex-wrap: wrap; gap: 10px; }
+.swatch-btn { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--line); cursor: none; transition: transform 0.2s; }
+.swatch-btn:hover { transform: scale(1.15); }
+
+.shop-toolbar {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 32px;
+}
+.shop-toolbar .count { font-family: var(--mono); font-size: 12px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.12em; }
+.shop-toolbar select { padding: 10px 14px; font: inherit; background: white; border: 1px solid var(--line); border-radius: 4px; }
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--s-5);
+}
+.product-card { position: relative; }
+.product-card .card-img {
+  aspect-ratio: 3/4; overflow: hidden; position: relative; margin-bottom: 16px; background: var(--bg-warm);
+}
+.product-card .placeholder-img { position: absolute; inset: 0; transition: transform 1s cubic-bezier(0.22,1,0.36,1);}
+.product-card:hover .placeholder-img { transform: scale(1.04); }
+.product-card .badge {
+  position: absolute; top: 12px; left: 12px; z-index: 3;
+  font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em;
+  padding: 6px 10px; border-radius: 4px;
+}
+.badge.new { background: var(--ink); color: var(--bg);}
+.badge.sale { background: var(--accent); color: var(--bg);}
+.badge.bestseller { background: var(--accent-olive); color: var(--bg);}
+.fav-btn {
+  position: absolute; top: 12px; right: 12px; z-index: 3;
+  width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(252,245,244,0.85); backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s;
+}
+.fav-btn:hover { background: var(--accent); color: white; }
+.fav-btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.5; }
+.product-card h4 { font-family: var(--serif); font-size: 22px; line-height: 1.2; margin-bottom: 6px;}
+.product-card .meta { display: flex; justify-content: space-between; align-items: center;}
+.product-card .price { font-family: var(--mono); font-size: 13px; }
+.product-card .old-price { font-family: var(--mono); font-size: 12px; color: var(--ink-mute); text-decoration: line-through; margin-right: 8px;}
+.product-card .colors { display: flex; gap: 4px; }
+.product-card .swatch { width: 12px; height: 12px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.1);}
+
+@media (max-width: 1100px) { .products-grid { grid-template-columns: repeat(2, 1fr);} }
+@media (max-width: 800px) { .shop-layout { grid-template-columns: 1fr; } .filters { position: static; } }
+</style>
+</head>
+<body>
+<div data-include="nav"></div>
+
+<header class="shop-header">
+  <div class="container">
+    <div>
+      <div class="eyebrow" style="margin-bottom: 16px;">— Tienda</div>
+      <h1 class="serif">Tejidos<br/><em style="color: var(--accent-deep); font-style: italic;">a tu medida</em>.</h1>
+    </div>
+    <p>Cada prenda es única. Si no encontrás tu talle o querés otro color, escribime y lo tejo para vos.</p>
+  </div>
+</header>
+
+<div class="shop-layout">
+  <aside class="filters">
+    <div class="filter-group">
+      <h5>Categorías</h5>
+      <ul id="cat-filter">
+        <li data-cat="all" class="active">Todos<span class="count" id="all-count"></span></li>
+      </ul>
+    </div>
+    <div class="filter-group">
+      <h5>Color</h5>
+      <div class="swatches-list">
+        <button class="swatch-btn" style="background:#CB674C" title="Terracota"></button>
+        <button class="swatch-btn" style="background:#36160E" title="Tinta"></button>
+        <button class="swatch-btn" style="background:#FCF5F4" title="Crema"></button>
+        <button class="swatch-btn" style="background:#6C95B0" title="Azul polvo"></button>
+        <button class="swatch-btn" style="background:#595421" title="Olivo"></button>
+        <button class="swatch-btn" style="background:#DBD7D3" title="Crudo"></button>
+      </div>
+    </div>
+    <div class="filter-group">
+      <h5>Talle</h5>
+      <ul>
+        <li>S<span class="count">8</span></li>
+        <li>M<span class="count">12</span></li>
+        <li>L<span class="count">10</span></li>
+        <li>Único<span class="count">6</span></li>
+        <li>Bebé<span class="count">9</span></li>
+      </ul>
+    </div>
+    <div class="filter-group">
+      <h5>Precio</h5>
+      <ul>
+        <li data-price="0,40000">Hasta $40.000</li>
+        <li data-price="40000,80000">$40 — $80.000</li>
+        <li data-price="80000,120000">$80 — $120.000</li>
+        <li data-price="120000,999999">+ $120.000</li>
+      </ul>
+    </div>
+  </aside>
+
+  <main>
+    <div class="shop-toolbar">
+      <div class="count"><span id="visible-count">0</span> piezas</div>
+      <select id="sort">
+        <option value="featured">Destacados primero</option>
+        <option value="new">Más nuevos</option>
+        <option value="price-asc">Precio: menor a mayor</option>
+        <option value="price-desc">Precio: mayor a menor</option>
+      </select>
+    </div>
+    <div class="products-grid" id="grid"></div>
+  </main>
+</div>
+
+<div data-include="footer"></div>
+
+<script src="assets/data.js"></script>
+<script src="assets/shared.js"></script>
+<script src="assets/layout.js"></script>
+<script>
+window.BDLLayout.mount('tienda');
+
+const params = new URLSearchParams(location.search);
+let activeCat = params.get('cat') || 'all';
+let activePrice = null;
+let sortBy = 'featured';
+
+const catUL = document.getElementById('cat-filter');
+window.BDL_CATEGORIES.forEach(c => {
+  const li = document.createElement('li');
+  li.dataset.cat = c.id;
+  li.innerHTML = `${c.name}<span class="count">${c.count}</span>`;
+  if (c.id === activeCat) li.classList.add('active');
+  catUL.appendChild(li);
+});
+document.getElementById('all-count').textContent = window.BDL_PRODUCTS.length;
+if (activeCat === 'all') catUL.querySelector('[data-cat="all"]').classList.add('active');
+else catUL.querySelector('[data-cat="all"]').classList.remove('active');
+
+catUL.querySelectorAll('li').forEach(li => {
+  li.addEventListener('click', () => {
+    catUL.querySelectorAll('li').forEach(x => x.classList.remove('active'));
+    li.classList.add('active');
+    activeCat = li.dataset.cat;
+    render();
+  });
+});
+
+document.querySelectorAll('[data-price]').forEach(li => {
+  li.addEventListener('click', () => {
+    const all = document.querySelectorAll('[data-price]');
+    if (li.classList.contains('active')) { li.classList.remove('active'); activePrice = null; }
+    else { all.forEach(x => x.classList.remove('active')); li.classList.add('active'); activePrice = li.dataset.price.split(',').map(Number); }
+    render();
+  });
+});
+
+document.getElementById('sort').addEventListener('change', e => { sortBy = e.target.value; render(); });
+
+function render() {
+  let list = window.BDL_PRODUCTS.slice();
+  if (activeCat !== 'all') list = list.filter(p => p.cat === activeCat);
+  if (activePrice) list = list.filter(p => p.price >= activePrice[0] && p.price <= activePrice[1]);
+  if (sortBy === 'price-asc') list.sort((a, b) => a.price - b.price);
+  if (sortBy === 'price-desc') list.sort((a, b) => b.price - a.price);
+  if (sortBy === 'new') list.sort((a, b) => (b.status === 'new') - (a.status === 'new'));
+
+  document.getElementById('visible-count').textContent = list.length;
+  document.getElementById('grid').innerHTML = list.map(p => `
+    <a href="producto.html?id=${p.id}" class="product-card">
+      <div class="card-img">
+        ${p.status ? `<span class="badge ${p.status}">${p.status === 'new' ? 'Nuevo' : p.status === 'sale' ? 'Oferta' : 'Best seller'}</span>` : ''}
+        <button class="fav-btn" onclick="event.preventDefault(); event.stopPropagation(); this.classList.toggle('fav-active'); this.querySelector('svg').setAttribute('fill', this.classList.contains('fav-active') ? 'currentColor' : 'none');">
+          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </button>
+        <div class="placeholder-img"><div class="placeholder-label">${p.placeholder}</div></div>
+      </div>
+      <h4>${p.name}</h4>
+      <div class="meta">
+        <span>
+          ${p.oldPrice ? `<span class="old-price">${fmtARS(p.oldPrice)}</span>` : ''}
+          <span class="price">${fmtARS(p.price)}</span>
+        </span>
+        <span class="colors">${p.colors.map(c => `<span class="swatch" style="background:${c}"></span>`).join('')}</span>
+      </div>
+    </a>
+  `).join('');
+}
+render();
+</script>
+</body>
+</html>

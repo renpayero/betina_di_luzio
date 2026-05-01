@@ -1,0 +1,24 @@
+---
+interface Props {
+  label: string;
+  gradient?: string;
+  class?: string;
+  labelClass?: string;
+  labelStyle?: string;
+}
+const {
+  label,
+  gradient,
+  class: className = '',
+  labelClass = '',
+  labelStyle = '',
+} = Astro.props;
+
+const style = gradient ? `background: ${gradient};` : '';
+---
+
+<div class={`placeholder-img ${className}`.trim()} style={style}>
+  <div class={`placeholder-label ${labelClass}`.trim()} style={labelStyle}>
+    <Fragment set:html={label} />
+  </div>
+</div>

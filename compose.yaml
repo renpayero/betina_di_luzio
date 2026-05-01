@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: betina_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: betina
+      POSTGRES_USER: betina
+      POSTGRES_PASSWORD: betina_dev
+    ports:
+      - "5435:5432"
+    volumes:
+      - betina_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U betina -d betina"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 5s
+
+volumes:
+  betina_pgdata:

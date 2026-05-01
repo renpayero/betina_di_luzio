@@ -1,0 +1,754 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import PlaceholderImg from '../components/PlaceholderImg.astro';
+import Marquee from '../components/Marquee.astro';
+import { getCategories, getFeaturedProducts } from '../lib/queries.ts';
+import { waLink } from '../lib/constants.ts';
+
+const ctaWa = waLink('Hola Betina! Quería pedirte un tejido personalizado.');
+const [categories, featured] = await Promise.all([
+  getCategories(),
+  getFeaturedProducts(4),
+]);
+
+const CAT_GRADIENTS: Record<string, string> = {
+  sweaters: 'linear-gradient(135deg, var(--terracota-200), var(--terracota-700))',
+  cardigans: 'linear-gradient(135deg, var(--azul-300), var(--azul-700))',
+  mantas: 'linear-gradient(135deg, var(--neutro-50), var(--neutro-300))',
+  accesorios: 'linear-gradient(135deg, var(--olivo-300), var(--olivo-900))',
+  bebes: 'linear-gradient(135deg, #FCF5F4, var(--terracota-100))',
+  home: 'linear-gradient(135deg, var(--terracota-500), var(--olivo-700))',
+};
+---
+
+<BaseLayout
+  title="Betina Di Luzio · Tejidos hechos a mano · Rosario"
+  description="Tejidos artesanales en crochet y dos agujas — prendas únicas hechas a mano en Rosario desde 2011. Sweaters, cardigans, mantas, accesorios."
+  active="home"
+>
+  <section class="hero">
+    <svg class="yarn-svg" viewBox="0 0 1440 900" preserveAspectRatio="none">
+      <path
+        class="yarn-path"
+        d="M -50,200 Q 360,80 720,250 T 1490,180"></path>
+      <path
+        class="yarn-path thick"
+        d="M -50,500 Q 300,650 720,500 T 1490,560"></path>
+      <path class="yarn-path" d="M -50,720 Q 400,800 720,720 T 1490,780"></path>
+      <path class="yarn-path" d="M -50,360 Q 500,300 900,420 T 1490,360"></path>
+    </svg>
+
+    <div class="hero-grid">
+      <div>
+        <div class="hero-eyebrow eyebrow reveal">
+          <span class="line"></span>
+          <span>Tejidos artesanales · Rosario · Desde 2011</span>
+        </div>
+        <h1 class="hero-title reveal reveal-delay-1">
+          Cada punto<br />guarda <em>una historia</em>.
+        </h1>
+        <p class="hero-lede reveal reveal-delay-2">
+          Prendas tejidas a mano, en crochet y dos agujas. Diseños únicos, hechos
+          a tu medida — con la calma y el cariño que sólo el tiempo puede dar.
+        </p>
+        <div class="hero-actions reveal reveal-delay-3">
+          <a href="/tienda" class="btn btn-primary">
+            Explorar la tienda
+            <svg class="arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              ><path d="M5 12h14M13 5l7 7-7 7"></path></svg
+            >
+          </a>
+          <a href="/nosotros" class="btn btn-secondary">Conocé a Betina</a>
+        </div>
+
+        <div class="hero-stats reveal reveal-delay-3">
+          <div class="stat">
+            <div class="num" data-count="14">0</div>
+            <div class="lbl">Años tejiendo</div>
+          </div>
+          <div class="stat">
+            <div class="num" data-count="500" data-suffix="+">0</div>
+            <div class="lbl">Piezas únicas</div>
+          </div>
+          <div class="stat">
+            <div class="num">100%</div>
+            <div class="lbl">Hecho a mano</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-visual reveal reveal-delay-2">
+        <div class="hero-card hero-card-1">
+          <PlaceholderImg label="FOTO IG · Sweater terracota<br/>800 × 1000" />
+        </div>
+        <div class="hero-card hero-card-2">
+          <PlaceholderImg
+            label="FOTO IG · Detalle tejido<br/>520 × 380"
+            gradient="linear-gradient(135deg, #DBD7D3, #B7B0A9)"
+          />
+        </div>
+        <div class="hero-card hero-card-3">
+          <PlaceholderImg
+            label="FOTO IG<br/>Manos tejiendo"
+            gradient="linear-gradient(135deg, #CCDEEA, #93BAD4)"
+          />
+        </div>
+        <div class="hero-tag tag-1">
+          <span class="pulse"></span>
+          <span>Pieza única · Edición limitada</span>
+        </div>
+        <div class="hero-tag tag-2" style="background: var(--accent);">
+          <span>Hecho con dos agujas</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <Marquee />
+
+  <section class="cats">
+    <div class="container" style="margin-bottom: 48px;">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow reveal">— Colecciones</div>
+          <h2 class="reveal reveal-delay-1">Una para cada momento.</h2>
+        </div>
+        <p class="reveal reveal-delay-2">
+          Tejidos pensados para abrazarte, regalar o decorar tu hogar. Todo se
+          puede personalizar en color, talle y detalles — escribime y lo armamos
+          juntas.
+        </p>
+      </div>
+    </div>
+    <div class="cats-grid">
+      {
+        categories.map((c, i) => (
+          <a
+            href={`/tienda?cat=${c.id}`}
+            class:list={['cat-tile', `reveal reveal-delay-${i % 3}`]}
+          >
+            <div class="cat-bg">
+              <PlaceholderImg
+                label={`FOTO · ${c.name}`}
+                gradient={
+                  CAT_GRADIENTS[c.id] ??
+                  'linear-gradient(135deg, var(--terracota-200), var(--terracota-700))'
+                }
+              />
+            </div>
+            <div class="cat-tile-content">
+              <h3>{c.name}</h3>
+              <span class="cat-blurb">{c.blurb}</span>
+            </div>
+            <div class="cat-arrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M5 12h14M13 5l7 7-7 7" />
+              </svg>
+            </div>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow reveal">— Lo nuevo de esta semana</div>
+          <h2 class="reveal reveal-delay-1">
+            Recién salidos<br />de las agujas.
+          </h2>
+        </div>
+        <p class="reveal reveal-delay-2">
+          Cada pieza se teje una sola vez. Si encontrás algo que te enamora,
+          escribime para reservarlo o pedir tu versión personalizada.
+        </p>
+      </div>
+      <div class="featured-grid">
+        {featured.map((p, i) => <ProductCard product={p} delay={(i % 4) as 0 | 1 | 2 | 3} />)}
+      </div>
+      <div style="text-align: center; margin-top: 64px;">
+        <a href="/tienda" class="btn btn-secondary">
+          Ver toda la tienda
+          <svg class="arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            ><path d="M5 12h14M13 5l7 7-7 7"></path></svg
+          >
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="background: var(--bg-warm);">
+    <div class="story">
+      <div class="story-img reveal">
+        <PlaceholderImg label="FOTO · Lili tejiendo<br/>retrato vertical 4:5" />
+      </div>
+      <div class="story-content">
+        <div class="eyebrow reveal" style="color: var(--accent-deep);">
+          — Sobre Lili
+        </div>
+        <h2 class="reveal reveal-delay-1" style="margin-top: 16px;">
+          El tejido es mi forma de meditar.
+        </h2>
+        <p class="quote serif-italic reveal reveal-delay-2">
+          "Tejer me lleva a la cocina de mi mamá, a las tardes con mi abuela.
+          Ahora dejo una parte mía en cada prenda — la pienso para vos."
+        </p>
+        <p class="reveal reveal-delay-3">
+          Betina arrancó su emprendimiento en 2011 desde Rosario, con la
+          convicción de que cada prenda merece tiempo, atención y cariño. Hoy son
+          cientos de personas en Argentina que llevan puesta una pieza única,
+          hecha a medida.
+        </p>
+        <div class="story-signature reveal reveal-delay-3">— Lili Di Luzio</div>
+        <div style="margin-top: 32px;" class="reveal reveal-delay-3">
+          <a href="/nosotros" class="btn btn-secondary">Leer mi historia</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="process">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow reveal" style="color: var(--terracota-200);">
+            — El proceso
+          </div>
+          <h2 class="reveal reveal-delay-1">De la lana<br />a tu puerta.</h2>
+        </div>
+        <p class="reveal reveal-delay-2">
+          Pedir un tejido a Betina es entrar en un ritmo distinto. No hay
+          producción masiva — hay tiempo, conversación y manos.
+        </p>
+      </div>
+      <div class="process-steps">
+        <div class="step reveal">
+          <h4>Conversamos</h4>
+          <p>
+            Me contás qué buscás, para quién, en qué color y talle. Si tenés una
+            foto inspiradora, mejor.
+          </p>
+        </div>
+        <div class="step reveal reveal-delay-1">
+          <h4>Diseño y materiales</h4>
+          <p>
+            Elijo los hilados, te paso una propuesta y juntas confirmamos
+            detalles, fecha y presupuesto.
+          </p>
+        </div>
+        <div class="step reveal reveal-delay-2">
+          <h4>Tejido a mano</h4>
+          <p>
+            Empieza el ritual. Cada prenda lleva entre 2 y 6 semanas, según
+            complejidad y materiales.
+          </p>
+        </div>
+        <div class="step reveal reveal-delay-3">
+          <h4>Llega a vos</h4>
+          <p>
+            Coordinamos envío a todo el país o retiro en Rosario. La prenda viaja
+            con instrucciones de cuidado.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-block">
+    <div class="container">
+      <h2 class="serif reveal">¿Tenés algo en mente?</h2>
+      <p class="reveal reveal-delay-1">
+        Pedidos a medida, regalos especiales, primera prenda de bebé. Escribime
+        y armamos lo que imaginás.
+      </p>
+      <div class="reveal reveal-delay-2">
+        <a
+          href={ctaWa}
+          target="_blank"
+          rel="noopener"
+          class="btn btn-primary"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"
+            ><path
+              d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 0 1 8.413 3.488 11.824 11.824 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24z"
+            ></path></svg
+          >
+          Hablemos por WhatsApp
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    padding: 140px 0 80px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+  }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1.05fr 1fr;
+    gap: var(--s-7);
+    align-items: center;
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 var(--s-7);
+    position: relative;
+    z-index: 2;
+  }
+  .hero-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--accent-deep);
+    margin-bottom: 28px;
+  }
+  .hero-eyebrow .line {
+    width: 56px;
+    height: 1px;
+    background: var(--accent);
+  }
+  .hero-title {
+    font-size: var(--t-display);
+    line-height: 0.95;
+    letter-spacing: -0.025em;
+    margin-bottom: 32px;
+    color: var(--ink);
+    font-family: var(--serif);
+  }
+  .hero-title em {
+    font-style: italic;
+    color: var(--accent-deep);
+    position: relative;
+  }
+  .hero-title em::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 6px;
+    height: 6px;
+    background: rgba(203, 103, 76, 0.15);
+    border-radius: 3px;
+    z-index: -1;
+  }
+  .hero-lede {
+    font-family: var(--serif);
+    font-size: 22px;
+    line-height: 1.5;
+    color: var(--ink-soft);
+    max-width: 480px;
+    margin-bottom: 40px;
+  }
+  .hero-actions {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .hero-visual {
+    position: relative;
+    height: 640px;
+  }
+  .hero-card {
+    position: absolute;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 18px 50px rgba(54, 22, 14, 0.12);
+  }
+  .hero-card :global(.placeholder-img) {
+    position: absolute;
+    inset: 0;
+  }
+  .hero-card-1 {
+    top: 0;
+    left: 8%;
+    width: 64%;
+    height: 78%;
+  }
+  .hero-card-2 {
+    bottom: 0;
+    right: 0;
+    width: 52%;
+    height: 60%;
+    transform: rotate(2deg);
+  }
+  .hero-card-3 {
+    top: 38%;
+    left: 0;
+    width: 32%;
+    height: 28%;
+    transform: rotate(-3deg);
+  }
+  .hero-tag {
+    position: absolute;
+    background: var(--bg-deep);
+    color: var(--bg);
+    padding: 14px 18px;
+    border-radius: 999px;
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .hero-tag .pulse {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #5fcf7c;
+    box-shadow: 0 0 10px #5fcf7c;
+  }
+  .tag-1 {
+    top: 18%;
+    right: 4%;
+    animation: float 6s ease-in-out infinite;
+  }
+  .tag-2 {
+    bottom: 22%;
+    left: 28%;
+    animation: float 7.5s ease-in-out infinite reverse;
+  }
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0) rotate(-1deg);
+    }
+    50% {
+      transform: translateY(-10px) rotate(1deg);
+    }
+  }
+
+  .yarn-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    opacity: 0.8;
+    pointer-events: none;
+  }
+  .yarn-path {
+    fill: none;
+    stroke: var(--terracota-200);
+    stroke-width: 1.2;
+    stroke-linecap: round;
+    stroke-dasharray: 4 8;
+    opacity: 0.5;
+    animation: yarn-flow 8s linear infinite;
+  }
+  .yarn-path.thick {
+    stroke: var(--accent);
+    stroke-width: 1.6;
+    opacity: 0.35;
+    stroke-dasharray: 8 14;
+    animation-duration: 12s;
+  }
+  @keyframes yarn-flow {
+    to {
+      stroke-dashoffset: -120;
+    }
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: var(--s-7);
+    margin-top: 48px;
+    padding-top: 36px;
+    border-top: 1px solid var(--line);
+    max-width: 480px;
+  }
+  .hero-stats .stat .num {
+    font-family: var(--serif);
+    font-size: 38px;
+    line-height: 1;
+  }
+  .hero-stats .stat .lbl {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--ink-soft);
+    margin-top: 6px;
+  }
+
+  @media (max-width: 900px) {
+    .hero-grid {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+    .hero-visual {
+      height: 480px;
+    }
+    .hero-stats {
+      gap: 24px;
+    }
+  }
+
+  .cats {
+    background: var(--bg-warm);
+    padding: var(--s-9) 0;
+    position: relative;
+  }
+  .cats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 var(--s-7);
+  }
+  .cat-tile {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    transition: transform var(--transition);
+  }
+  .cat-tile:hover {
+    transform: scale(0.98);
+  }
+  .cat-bg {
+    position: absolute;
+    inset: 0;
+    transition: transform 1s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .cat-bg :global(.placeholder-img) {
+    position: absolute;
+    inset: 0;
+  }
+  .cat-tile:hover .cat-bg {
+    transform: scale(1.06);
+  }
+  .cat-tile-content {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 32px;
+    background: linear-gradient(
+      to top,
+      rgba(54, 22, 14, 0.7) 0%,
+      rgba(54, 22, 14, 0.1) 50%,
+      transparent 100%
+    );
+    color: var(--bg);
+    z-index: 2;
+  }
+  .cat-tile h3 {
+    font-size: 36px;
+    margin-bottom: 8px;
+  }
+  .cat-blurb {
+    font-family: var(--serif);
+    font-style: italic;
+    opacity: 0.85;
+    font-size: 16px;
+  }
+  .cat-arrow {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(252, 245, 244, 0.15);
+    border: 1px solid rgba(252, 245, 244, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-fast);
+    z-index: 3;
+  }
+  .cat-tile:hover .cat-arrow {
+    background: var(--accent);
+    border-color: var(--accent);
+    transform: rotate(-45deg);
+  }
+  .cat-arrow svg {
+    width: 16px;
+    height: 16px;
+    stroke: var(--bg);
+  }
+  @media (max-width: 900px) {
+    .cats-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .featured-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--s-5);
+  }
+  @media (max-width: 1100px) {
+    .featured-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  @media (max-width: 800px) {
+    .featured-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+  }
+
+  .story {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: var(--s-9);
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 var(--s-7);
+  }
+  .story-img {
+    aspect-ratio: 4 / 5;
+    position: relative;
+  }
+  .story-img :global(.placeholder-img) {
+    position: absolute;
+    inset: 0;
+  }
+  .story-content .quote {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(28px, 3vw, 44px);
+    line-height: 1.25;
+    color: var(--ink);
+    margin: 24px 0 32px;
+    position: relative;
+    padding-left: 28px;
+  }
+  .story-content .quote::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 12px;
+    bottom: 12px;
+    width: 2px;
+    background: var(--accent);
+  }
+  .story-content p {
+    color: var(--ink-soft);
+    margin-bottom: 16px;
+    line-height: 1.8;
+  }
+  .story-signature {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 24px;
+    color: var(--accent-deep);
+    margin-top: 24px;
+  }
+  @media (max-width: 900px) {
+    .story {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .process {
+    background: var(--bg-deep);
+    color: var(--bg);
+    padding: var(--s-10) 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .process h2 {
+    color: var(--bg);
+  }
+  .process :global(.section-head p) {
+    color: rgba(252, 245, 244, 0.65);
+  }
+  .process-steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--s-6);
+    counter-reset: step;
+  }
+  .step {
+    position: relative;
+    padding-top: 48px;
+    border-top: 1px solid rgba(252, 245, 244, 0.15);
+    transition: border-color var(--transition);
+  }
+  .step::before {
+    counter-increment: step;
+    content: '0' counter(step);
+    position: absolute;
+    top: 16px;
+    left: 0;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--terracota-200);
+    letter-spacing: 0.2em;
+  }
+  .step:hover {
+    border-color: var(--terracota-200);
+  }
+  .step h4 {
+    font-family: var(--serif);
+    font-size: 26px;
+    margin-bottom: 12px;
+    line-height: 1.2;
+  }
+  .step p {
+    color: rgba(252, 245, 244, 0.6);
+    font-size: 14px;
+    line-height: 1.7;
+  }
+  @media (max-width: 900px) {
+    .process-steps {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .cta-block {
+    background: var(--accent);
+    color: var(--bg);
+    padding: var(--s-10) 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-block h2 {
+    font-size: var(--t-h1);
+    color: var(--bg);
+    max-width: 900px;
+    margin: 0 auto 24px;
+  }
+  .cta-block p {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 22px;
+    opacity: 0.9;
+    max-width: 580px;
+    margin: 0 auto 40px;
+  }
+  .cta-block :global(.btn-primary) {
+    background: var(--bg-deep);
+    color: var(--bg);
+  }
+  .cta-block :global(.btn-primary:hover) {
+    background: var(--ink);
+  }
+  .cta-block::before {
+    content: '';
+    position: absolute;
+    inset: -100px;
+    background-image: repeating-linear-gradient(
+      45deg,
+      transparent 0 30px,
+      rgba(255, 255, 255, 0.04) 30px 31px
+    );
+  }
+</style>
