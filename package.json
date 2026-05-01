@@ -18,11 +18,15 @@
     "db:studio": "drizzle-kit studio",
     "db:seed": "tsx src/db/seed.ts",
     "setup": "npm run db:up && npm run db:wait && npm run db:push && npm run db:seed",
-    "db:wait": "node -e \"const{Client}=require('pg');const c=new Client({connectionString:process.env.DATABASE_URL});const t=Date.now();(async()=>{while(Date.now()-t<30000){try{await c.connect();await c.end();process.exit(0)}catch(e){await new Promise(r=>setTimeout(r,500))}}process.exit(1)})()\""
+    "db:wait": "node -e \"const{Client}=require('pg');const c=new Client({connectionString:process.env.DATABASE_URL});const t=Date.now();(async()=>{while(Date.now()-t<30000){try{await c.connect();await c.end();process.exit(0)}catch(e){await new Promise(r=>setTimeout(r,500))}}process.exit(1)})()\"",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",
     "@astrojs/node": "^9.2.0",
+    "@node-rs/argon2": "^2",
     "astro": "^5.1.0",
     "drizzle-orm": "^0.36.4",
     "pg": "^8.13.1",
@@ -32,8 +36,11 @@
     "@tailwindcss/vite": "^4.0.0",
     "@types/node": "^22.10.2",
     "@types/pg": "^8.11.10",
+    "@vitest/ui": "^2",
     "drizzle-kit": "^0.30.1",
+    "jsdom": "^25",
     "tailwindcss": "^4.0.0",
-    "tsx": "^4.19.2"
+    "tsx": "^4.19.2",
+    "vitest": "^2"
   }
 }

@@ -1,0 +1,158 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import AdminNav from '../components/AdminNav.astro';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+const user = Astro.locals.user!;
+const pathname = Astro.url.pathname;
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>{title} · Admin · Betina Di Luzio</title>
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='10' fill='%23CB674C'/%3E%3Ctext x='12' y='17' text-anchor='middle' fill='%23FCF5F4' font-family='Georgia,serif' font-size='14' font-style='italic'%3EB%3C/text%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+    />
+    <ClientRouter fallback="swap" />
+  </head>
+  <body class="admin-body">
+    <div class="admin-shell">
+      <AdminNav pathname={pathname} />
+
+      <header class="admin-topbar">
+        <div class="admin-topbar__title">
+          <small>— Admin</small>
+          <h1>{title}</h1>
+        </div>
+        <div class="admin-topbar__user">
+          <div class="admin-user">
+            <span class="admin-user__name">{user.name}</span>
+            <span class="admin-user__email">{user.email}</span>
+          </div>
+          <form method="post" action="/api/auth/logout" class="admin-logout">
+            <button type="submit">Salir</button>
+          </form>
+        </div>
+      </header>
+
+      <main id="main" class="admin-main" tabindex="-1">
+        <slot />
+      </main>
+    </div>
+
+    <style>
+      .admin-body {
+        background: var(--bg-card);
+      }
+      .admin-shell {
+        display: grid;
+        grid-template-columns: 240px 1fr;
+        grid-template-rows: 72px 1fr;
+        grid-template-areas:
+          'nav top'
+          'nav main';
+        min-height: 100dvh;
+      }
+      .admin-topbar {
+        grid-area: top;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 40px;
+        border-bottom: 1px solid var(--line);
+        background: var(--bg);
+      }
+      .admin-topbar__title small {
+        font-family: var(--mono);
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        color: var(--accent-deep);
+        display: block;
+        margin-bottom: 2px;
+      }
+      .admin-topbar__title h1 {
+        font-family: var(--serif);
+        font-size: 24px;
+        font-weight: 500;
+        line-height: 1;
+      }
+      .admin-topbar__user {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
+      .admin-user {
+        text-align: right;
+        line-height: 1.2;
+      }
+      .admin-user__name {
+        font-family: var(--serif);
+        font-size: 16px;
+        display: block;
+      }
+      .admin-user__email {
+        font-family: var(--mono);
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--ink-mute);
+      }
+      .admin-logout button {
+        font-family: var(--mono);
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        padding: 10px 18px;
+        border-radius: var(--radius-pill);
+        background: var(--ink);
+        color: var(--bg);
+        transition: background var(--transition-fast);
+      }
+      .admin-logout button:hover {
+        background: var(--accent-deep);
+      }
+      .admin-main {
+        grid-area: main;
+        padding: 40px;
+        background: var(--bg-card);
+      }
+      @media (max-width: 900px) {
+        .admin-shell {
+          grid-template-columns: 1fr;
+          grid-template-rows: auto auto 1fr;
+          grid-template-areas:
+            'nav'
+            'top'
+            'main';
+        }
+        .admin-topbar {
+          padding: 16px 20px;
+          flex-wrap: wrap;
+          gap: 12px;
+        }
+        .admin-main {
+          padding: 24px 20px;
+        }
+      }
+    </style>
+  </body>
+</html>

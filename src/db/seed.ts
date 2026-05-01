@@ -8,8 +8,10 @@ try {
 } catch {}
 
 const { db, pool } = await import('./client.ts');
-import { categories, products } from './schema.ts';
-import type { NewCategory, NewProduct } from './schema.ts';
+import { inArray } from 'drizzle-orm';
+import { categories, products, productImages, users } from './schema.ts';
+import type { NewCategory, NewProduct, NewProductImage } from './schema.ts';
+const { hashPassword } = await import('../lib/auth.ts');
 
 const seedCategories: NewCategory[] = [
   { id: 'sweaters', slug: 'sweaters', name: 'Sweaters', blurb: 'Calidez tejida para cada estación.', sortOrder: 1 },
@@ -144,14 +146,52 @@ async function main() {
     .values(seedProducts)
     .onConflictDoNothing({ target: products.id });
 
+  console.log('→ Seeding imágenes de productos…');
+  const productIds = seedProducts.map((p) => p.id!);
+  await db
+    .delete(productImages)
+    .where(inArray(productImages.productId, productIds));
+
+  const altSuffixes = [
+    'vista frontal',
+    'detalle del tejido',
+    'en uso',
+    'vista trasera',
+  ] as const;
+  const imagesToInsert: NewProductImage[] = seedProducts.flatMap((p) =>
+    altSuffixes.map((suffix, i) => ({
+      productId: p.id!,
+      url: `/img/placeholder/${p.slug}-${i + 1}.svg`,
+      alt: `${p.name} — ${suffix}`,
+      sortOrder: i,
+      isHero: i === 0,
+    }))
+  );
+  await db.insert(productImages).values(imagesToInsert);
+
   const [{ catCount }] = await db.execute<{ catCount: number }>(
     "select count(*)::int as \"catCount\" from categories"
   ).then((r) => r.rows) as [{ catCount: number }];
   const [{ prodCount }] = await db.execute<{ prodCount: number }>(
     "select count(*)::int as \"prodCount\" from products"
   ).then((r) => r.rows) as [{ prodCount: number }];
+  const [{ imgCount }] = await db.execute<{ imgCount: number }>(
+    "select count(*)::int as \"imgCount\" from product_images"
+  ).then((r) => r.rows) as [{ imgCount: number }];
 
-  console.log(`✓ Listo. ${catCount} categorías, ${prodCount} productos.`);
+  console.log('→ Seeding admin user…');
+  const adminHash = await hashPassword('tejido2026');
+  await db
+    .insert(users)
+    .values({
+      email: 'admin@betinadiluzio.com',
+      name: 'Lili',
+      role: 'admin',
+      passwordHash: adminHash,
+    })
+    .onConflictDoNothing({ target: users.email });
+
+  console.log(`✓ Listo. ${catCount} categorías, ${prodCount} productos, ${imgCount} imágenes.`);
 }
 
 main()

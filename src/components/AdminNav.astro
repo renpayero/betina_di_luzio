@@ -1,0 +1,124 @@
+---
+interface Props {
+  pathname: string;
+}
+const { pathname } = Astro.props;
+
+const items: ReadonlyArray<{ href: string; label: string }> = [
+  { href: '/admin', label: 'Dashboard' },
+  { href: '/admin/productos', label: 'Productos' },
+  { href: '/admin/categorias', label: 'Categorías' },
+  { href: '/admin/stock', label: 'Stock' },
+  { href: '/admin/cupones', label: 'Cupones' },
+  { href: '/admin/contenido', label: 'Contenido' },
+];
+
+const isActive = (href: string): boolean =>
+  href === '/admin' ? pathname === '/admin' : pathname.startsWith(href);
+---
+
+<aside class="admin-nav" aria-label="Navegación admin">
+  <a href="/admin" class="admin-brand">
+    <span class="admin-brand__name">Betina<em> · </em>Di Luzio</span>
+    <small class="admin-brand__sub">Panel · Lili</small>
+  </a>
+
+  <nav>
+    <ul>
+      {
+        items.map((it) => (
+          <li>
+            <a
+              href={it.href}
+              aria-current={isActive(it.href) ? 'page' : undefined}
+              class:list={['admin-nav__link', isActive(it.href) && 'is-active']}
+            >
+              {it.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+
+  <a href="/" class="admin-nav__back">← Ver tienda</a>
+</aside>
+
+<style>
+  .admin-nav {
+    grid-area: nav;
+    background: var(--bg-deep);
+    color: var(--bg);
+    padding: 32px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    min-height: 100dvh;
+    position: sticky;
+    top: 0;
+  }
+  .admin-brand {
+    display: block;
+  }
+  .admin-brand__name {
+    font-family: var(--serif);
+    font-size: 22px;
+    line-height: 1.1;
+    display: block;
+  }
+  .admin-brand__name em {
+    font-style: italic;
+    color: var(--terracota-200);
+  }
+  .admin-brand__sub {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--neutro-100);
+    margin-top: 6px;
+    display: block;
+  }
+  .admin-nav nav ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .admin-nav__link {
+    display: block;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    font-family: var(--mono);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--neutro-50);
+    transition: background var(--transition-fast), color var(--transition-fast);
+  }
+  .admin-nav__link:hover {
+    background: rgba(252, 245, 244, 0.06);
+    color: var(--bg);
+  }
+  .admin-nav__link.is-active {
+    background: var(--terracota-500);
+    color: var(--bg);
+  }
+  .admin-nav__back {
+    margin-top: auto;
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--neutro-100);
+  }
+  .admin-nav__back:hover {
+    color: var(--terracota-200);
+  }
+  @media (max-width: 900px) {
+    .admin-nav {
+      position: relative;
+      min-height: auto;
+    }
+  }
+</style>

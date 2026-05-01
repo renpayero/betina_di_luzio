@@ -1,5 +1,18 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+
+const errorMap: Record<string, string> = {
+  'Datos incompletos.': 'Revisá email y contraseña (mínimo 6 caracteres).',
+  'Email o contraseña incorrectos.': 'Email o contraseña incorrectos.',
+  'Demasiados intentos. Probá en un minuto.':
+    'Demasiados intentos. Esperá un minuto antes de reintentar.',
+};
+const rawError = Astro.url.searchParams.get('error') ?? '';
+const errorMsg = rawError ? (errorMap[rawError] ?? rawError) : '';
+const next = Astro.url.searchParams.get('next') ?? '';
+const action = next
+  ? `/api/auth/login?next=${encodeURIComponent(next)}`
+  : '/api/auth/login';
 ---
 
 <BaseLayout title="Ingresar" description="Acceso al panel de administración." active="login" hideChrome noindex>
@@ -25,35 +38,45 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         </p>
 
         <div class="demo-hint">
-          <strong>Demo:</strong> el panel admin se conecta más adelante con la BD
-          (Phase 2). Por ahora este formulario es decorativo.
+          <strong>Demo:</strong> credenciales seed
+          <code>admin@betinadiluzio.com</code> / <code>tejido2026</code>.
+          Sesión real con cookies httpOnly y Argon2id.
         </div>
 
-        <form id="login-form">
+        {errorMsg && (
+          <div class="form-error" role="alert">{errorMsg}</div>
+        )}
+
+        <form id="login-form" method="post" action={action} novalidate>
           <div class="field">
-            <label>Email</label>
+            <label for="login-email">Email</label>
             <input
+              id="login-email"
               type="email"
+              name="email"
               required
+              autocomplete="email"
               placeholder="admin@betinadiluzio.com"
             />
           </div>
           <div class="field">
-            <label>Contraseña</label>
-            <input type="password" required />
+            <label for="login-password">Contraseña</label>
+            <input
+              id="login-password"
+              type="password"
+              name="password"
+              required
+              minlength="6"
+              autocomplete="current-password"
+            />
           </div>
           <div class="form-row">
             <label class="remember">
-              <input type="checkbox" /> Recordarme
+              <input type="checkbox" name="remember" /> Recordarme
             </label>
-            <a href="#">¿Olvidaste tu contraseña?</a>
           </div>
           <button type="submit"> Ingresar al panel </button>
         </form>
-        <div class="divider">o</div>
-        <p class="signup">
-          ¿Sos cliente y querés crear cuenta? <a href="#">Registrate</a>
-        </p>
       </div>
     </div>
   </main>
@@ -223,6 +246,51 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   .demo-hint strong {
     color: var(--accent-deep);
   }
+  .demo-hint code {
+    font-family: var(--mono);
+    font-size: 11px;
+    background: var(--bg);
+    padding: 1px 6px;
+    border-radius: 3px;
+  }
+  .form-error {
+    background: var(--terracota-100);
+    color: var(--terracota-900);
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    margin-bottom: 16px;
+    border-left: 3px solid var(--terracota-700);
+  }
+  .login-form input[type='email'],
+  .login-form input[type='password'] {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    background: var(--bg-card);
+    font-family: var(--sans);
+    font-size: 15px;
+    color: var(--ink);
+  }
+  .login-form input[type='email']:focus,
+  .login-form input[type='password']:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+    border-color: var(--accent);
+  }
+  .login-form label {
+    display: block;
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--ink-soft);
+    margin-bottom: 6px;
+  }
+  .login-form .remember {
+    margin-bottom: 0;
+  }
   .back-link {
     font-family: var(--mono);
     font-size: 11px;
@@ -248,17 +316,3 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   }
 </style>
 
-<script>
-  const wireForm = () => {
-    const form = document.getElementById('login-form') as HTMLFormElement | null;
-    form?.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const btn = form.querySelector<HTMLButtonElement>('button[type="submit"]');
-      if (btn) {
-        btn.textContent = 'Backend pendiente — Phase 2';
-        btn.disabled = true;
-      }
-    });
-  };
-  document.addEventListener('astro:page-load', wireForm);
-</script>
