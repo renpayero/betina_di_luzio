@@ -6,6 +6,7 @@ import JsonLd from '../../components/JsonLd.astro';
 import {
   getCategoryById,
   getProductBySlug,
+  getProductImages,
   getRelatedProducts,
 } from '../../lib/queries.ts';
 import { fmtARS, calcDiscount } from '../../lib/format.ts';
@@ -21,9 +22,10 @@ if (!product) {
   return new Response(null, { status: 404 });
 }
 
-const [category, related] = await Promise.all([
+const [category, related, images] = await Promise.all([
   getCategoryById(product.categoryId),
   getRelatedProducts(product.id, product.categoryId, 4),
+  getProductImages(product.id),
 ]);
 
 const statusLabel =
@@ -78,30 +80,52 @@ trail.push({ name: product.name, url: `/producto/${product.slug}` });
       <div class="gallery">
         <div class="gallery-thumbs" role="tablist" aria-label="Galería de imágenes">
           {
-            galleryThumbs.map((label, i) => {
-              const c = product.colors[i % product.colors.length] ?? '#CB674C';
-              const grad = `linear-gradient(135deg, ${c}40, ${c}90)`;
-              return (
-                <button
-                  type="button"
-                  class:list={['thumb', { active: i === 0 }]}
-                  data-thumb-idx={i}
-                  role="tab"
-                  aria-selected={i === 0 ? 'true' : 'false'}
-                  aria-label={label}
-                >
-                  <PlaceholderImg
-                    label={label}
-                    gradient={grad}
-                    labelStyle="font-size:9px"
-                  />
-                </button>
-              );
-            })
+            images.length > 0
+              ? images.map((img, i) => {
+                  const c = product.colors[i % product.colors.length] ?? '#CB674C';
+                  const grad = `linear-gradient(135deg, ${c}40, ${c}90)`;
+                  return (
+                    <button
+                      type="button"
+                      class:list={['thumb', { active: i === 0 }]}
+                      data-thumb-idx={i}
+                      data-src={img.url}
+                      role="tab"
+                      aria-selected={i === 0 ? 'true' : 'false'}
+                      aria-label={img.alt}
+                    >
+                      <PlaceholderImg
+                        label={img.alt}
+                        gradient={grad}
+                        labelStyle="font-size:9px"
+                      />
+                    </button>
+                  );
+                })
+              : galleryThumbs.map((label, i) => {
+                  const c = product.colors[i % product.colors.length] ?? '#CB674C';
+                  const grad = `linear-gradient(135deg, ${c}40, ${c}90)`;
+                  return (
+                    <button
+                      type="button"
+                      class:list={['thumb', { active: i === 0 }]}
+                      data-thumb-idx={i}
+                      role="tab"
+                      aria-selected={i === 0 ? 'true' : 'false'}
+                      aria-label={label}
+                    >
+                      <PlaceholderImg
+                        label={label}
+                        gradient={grad}
+                        labelStyle="font-size:9px"
+                      />
+                    </button>
+                  );
+                })
           }
         </div>
         <div class="gallery-main" role="tabpanel" aria-live="polite">
-          <PlaceholderImg label={product.placeholder} />
+          <PlaceholderImg label={images[0]?.alt ?? product.placeholder} />
         </div>
       </div>
 
