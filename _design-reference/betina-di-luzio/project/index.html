@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Betina Di Luzio · Tejidos hechos a mano · Rosario</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+<style>
+/* === HERO === */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  padding: 140px 0 80px;
+  display: flex; align-items: center;
+  overflow: hidden;
+}
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  gap: var(--s-7);
+  align-items: center;
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 var(--s-7);
+  position: relative; z-index: 2;
+}
+.hero-eyebrow { display: flex; align-items: center; gap: 12px; color: var(--accent-deep); margin-bottom: 28px;}
+.hero-eyebrow .line { width: 56px; height: 1px; background: var(--accent); }
+.hero-title {
+  font-size: var(--t-display);
+  line-height: 0.95;
+  letter-spacing: -0.025em;
+  margin-bottom: 32px;
+  color: var(--ink);
+}
+.hero-title em {
+  font-style: italic;
+  color: var(--accent-deep);
+  position: relative;
+}
+.hero-title em::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 6px;
+  height: 6px;
+  background: rgba(203,103,76,0.15);
+  border-radius: 3px;
+  z-index: -1;
+}
+.hero-lede {
+  font-family: var(--serif);
+  font-size: 22px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  max-width: 480px;
+  margin-bottom: 40px;
+}
+.hero-actions { display: flex; gap: 16px; flex-wrap: wrap; }
+
+/* Hero visual: layered placeholders + hilo animado */
+.hero-visual { position: relative; height: 640px; }
+.hero-card {
+  position: absolute;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 18px 50px rgba(54, 22, 14, 0.12);
+}
+.hero-card-1 { top: 0; left: 8%; width: 64%; height: 78%; }
+.hero-card-2 { bottom: 0; right: 0; width: 52%; height: 60%; transform: rotate(2deg);}
+.hero-card-3 { top: 38%; left: 0; width: 32%; height: 28%; transform: rotate(-3deg);}
+.hero-tag {
+  position: absolute;
+  background: var(--bg-deep); color: var(--bg);
+  padding: 14px 18px;
+  border-radius: 999px;
+  font-family: var(--mono); font-size: 10px; text-transform: uppercase;
+  letter-spacing: 0.18em;
+  display: flex; align-items: center; gap: 10px;
+}
+.hero-tag .pulse { width: 6px; height: 6px; border-radius: 50%; background: #5fcf7c; box-shadow: 0 0 10px #5fcf7c;}
+.tag-1 { top: 18%; right: 4%; animation: float 6s ease-in-out infinite; }
+.tag-2 { bottom: 22%; left: 28%; animation: float 7.5s ease-in-out infinite reverse; }
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(-1deg);}
+  50% { transform: translateY(-10px) rotate(1deg);}
+}
+
+/* Animated yarn lines behind hero */
+.yarn-svg { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; opacity: 0.8; pointer-events: none;}
+.yarn-path { fill: none; stroke: var(--terracota-200); stroke-width: 1.2; stroke-linecap: round; stroke-dasharray: 4 8; opacity: 0.5; }
+.yarn-path.thick { stroke: var(--accent); stroke-width: 1.6; opacity: 0.35; stroke-dasharray: 8 14; }
+
+/* Hero number stats */
+.hero-stats {
+  display: flex; gap: var(--s-7);
+  margin-top: 48px;
+  padding-top: 36px;
+  border-top: 1px solid var(--line);
+  max-width: 480px;
+}
+.hero-stats .stat .num { font-family: var(--serif); font-size: 38px; line-height: 1; }
+.hero-stats .stat .lbl { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.18em; color: var(--ink-soft); margin-top: 6px;}
+
+@media (max-width: 900px) {
+  .hero-grid { grid-template-columns: 1fr; gap: 40px; }
+  .hero-visual { height: 480px; }
+  .hero-stats { gap: 24px; }
+}
+
+/* === Categories Strip === */
+.cats {
+  background: var(--bg-warm);
+  padding: var(--s-9) 0;
+  position: relative;
+}
+.cats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 var(--s-7);
+}
+.cat-tile {
+  position: relative;
+  aspect-ratio: 4/5;
+  overflow: hidden;
+  cursor: none;
+  transition: transform var(--transition);
+}
+.cat-tile:hover { transform: scale(0.98); }
+.cat-tile .cat-bg { position: absolute; inset: 0; transition: transform 1s cubic-bezier(0.22,1,0.36,1); }
+.cat-tile:hover .cat-bg { transform: scale(1.06); }
+.cat-tile-content {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 32px;
+  background: linear-gradient(to top, rgba(54,22,14,0.7) 0%, rgba(54,22,14,0.1) 50%, transparent 100%);
+  color: var(--bg);
+  z-index: 2;
+}
+.cat-tile h3 { font-size: 36px; margin-bottom: 8px; }
+.cat-tile .cat-blurb { font-family: var(--serif); font-style: italic; opacity: 0.85; font-size: 16px; }
+.cat-tile .cat-arrow {
+  position: absolute; top: 24px; right: 24px;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: rgba(252,245,244,0.15);
+  border: 1px solid rgba(252,245,244,0.3);
+  display: flex; align-items: center; justify-content: center;
+  transition: all var(--transition-fast);
+  z-index: 3;
+}
+.cat-tile:hover .cat-arrow { background: var(--accent); border-color: var(--accent); transform: rotate(-45deg); }
+.cat-tile .cat-arrow svg { width: 16px; height: 16px; stroke: var(--bg); fill: none; stroke-width: 1.5;}
+
+@media (max-width: 900px) { .cats-grid { grid-template-columns: 1fr 1fr; } }
+
+/* === Featured Products === */
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--s-5);
+}
+.product-card { position: relative; }
+.product-card .card-img {
+  aspect-ratio: 3/4;
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 16px;
+  background: var(--bg-warm);
+}
+.product-card .card-img .placeholder-img { position: absolute; inset: 0; transition: transform 1s cubic-bezier(0.22,1,0.36,1);}
+.product-card:hover .card-img .placeholder-img { transform: scale(1.04); }
+.product-card .badge {
+  position: absolute; top: 12px; left: 12px; z-index: 3;
+  font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em;
+  padding: 6px 10px; border-radius: 4px;
+}
+.badge.new { background: var(--ink); color: var(--bg);}
+.badge.sale { background: var(--accent); color: var(--bg);}
+.badge.bestseller { background: var(--accent-olive); color: var(--bg);}
+.product-card .quick {
+  position: absolute; bottom: 16px; left: 16px; right: 16px;
+  background: var(--bg);
+  border: none;
+  padding: 12px 16px;
+  font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.18em;
+  border-radius: 999px;
+  opacity: 0; transform: translateY(8px);
+  transition: opacity 0.3s, transform 0.3s, background 0.3s, color 0.3s;
+}
+.product-card:hover .quick { opacity: 1; transform: none; }
+.product-card .quick:hover { background: var(--ink); color: var(--bg); }
+.product-card h4 { font-family: var(--serif); font-size: 22px; line-height: 1.2; margin-bottom: 6px;}
+.product-card .meta { display: flex; justify-content: space-between; align-items: center;}
+.product-card .price { font-family: var(--mono); font-size: 13px; }
+.product-card .old-price { font-family: var(--mono); font-size: 12px; color: var(--ink-mute); text-decoration: line-through; margin-right: 8px;}
+.product-card .colors { display: flex; gap: 4px; }
+.product-card .swatch { width: 12px; height: 12px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.1);}
+
+@media (max-width: 1100px) { .products-grid { grid-template-columns: repeat(3, 1fr);} }
+@media (max-width: 800px) { .products-grid { grid-template-columns: 1fr 1fr; gap: 16px;} }
+
+/* === Story strip === */
+.story {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: var(--s-9);
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 var(--s-7);
+}
+.story-img {
+  aspect-ratio: 4/5;
+  position: relative;
+}
+.story-img .placeholder-img { position: absolute; inset: 0;}
+.story-content .quote {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(28px, 3vw, 44px);
+  line-height: 1.25;
+  color: var(--ink);
+  margin: 24px 0 32px;
+  position: relative;
+  padding-left: 28px;
+}
+.story-content .quote::before {
+  content: ""; position: absolute; left: 0; top: 12px; bottom: 12px;
+  width: 2px; background: var(--accent);
+}
+.story-content p { color: var(--ink-soft); margin-bottom: 16px; line-height: 1.8;}
+.story-signature { font-family: var(--serif); font-style: italic; font-size: 24px; color: var(--accent-deep); margin-top: 24px; }
+@media (max-width: 900px) { .story { grid-template-columns: 1fr; } }
+
+/* === Process === */
+.process {
+  background: var(--bg-deep);
+  color: var(--bg);
+  padding: var(--s-10) 0;
+  position: relative;
+  overflow: hidden;
+}
+.process .container { position: relative; z-index: 2; }
+.process h2 { color: var(--bg); }
+.process .section-head p { color: rgba(252,245,244,0.65); }
+.process-steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--s-6);
+  counter-reset: step;
+}
+.step {
+  position: relative;
+  padding-top: 48px;
+  border-top: 1px solid rgba(252,245,244,0.15);
+  transition: border-color var(--transition);
+}
+.step::before {
+  counter-increment: step;
+  content: "0" counter(step);
+  position: absolute; top: 16px; left: 0;
+  font-family: var(--mono); font-size: 11px;
+  color: var(--terracota-200); letter-spacing: 0.2em;
+}
+.step:hover { border-color: var(--terracota-200); }
+.step h4 { font-family: var(--serif); font-size: 26px; margin-bottom: 12px; line-height: 1.2;}
+.step p { color: rgba(252,245,244,0.6); font-size: 14px; line-height: 1.7; }
+@media (max-width: 900px) { .process-steps { grid-template-columns: 1fr 1fr; } }
+
+/* === CTA Block === */
+.cta-block {
+  background: var(--accent);
+  color: var(--bg);
+  padding: var(--s-10) 0;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.cta-block .container { position: relative; z-index: 2; }
+.cta-block h2 { font-size: var(--t-h1); color: var(--bg); max-width: 900px; margin: 0 auto 24px;}
+.cta-block p { font-family: var(--serif); font-style: italic; font-size: 22px; opacity: 0.9; max-width: 580px; margin: 0 auto 40px;}
+.cta-block .btn-primary { background: var(--bg-deep); color: var(--bg); }
+.cta-block .btn-primary:hover { background: var(--ink); }
+.cta-block::before {
+  content: ""; position: absolute; inset: -100px;
+  background-image: repeating-linear-gradient(45deg, transparent 0 30px, rgba(255,255,255,0.04) 30px 31px);
+}
+
+/* === Press / IG strip === */
+.press {
+  padding: var(--s-9) 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  text-align: center;
+}
+.press-eyebrow { color: var(--ink-soft); margin-bottom: 32px; }
+.ig-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 4px;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 4px;
+}
+.ig-tile {
+  aspect-ratio: 1;
+  position: relative;
+  overflow: hidden;
+}
+.ig-tile .placeholder-img { position: absolute; inset: 0;}
+.ig-tile .ig-overlay {
+  position: absolute; inset: 0;
+  background: rgba(54,22,14,0.7);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity 0.4s;
+  color: var(--bg);
+}
+.ig-tile:hover .ig-overlay { opacity: 1; }
+.ig-overlay svg { width: 24px; height: 24px; }
+@media (max-width: 800px) { .ig-grid { grid-template-columns: repeat(3, 1fr); } }
+</style>
+</head>
+<body>
+<div data-include="nav"></div>
+
+<!-- ==========  HERO ========== -->
+<section class="hero" data-screen-label="01 Home Hero">
+  <svg class="yarn-svg" viewBox="0 0 1440 900" preserveAspectRatio="none">
+    <path class="yarn-path" id="y1" d="M -50,200 Q 360,80 720,250 T 1490,180" />
+    <path class="yarn-path thick" id="y2" d="M -50,500 Q 300,650 720,500 T 1490,560" />
+    <path class="yarn-path" id="y3" d="M -50,720 Q 400,800 720,720 T 1490,780" />
+    <path class="yarn-path" id="y4" d="M -50,360 Q 500,300 900,420 T 1490,360" />
+  </svg>
+
+  <div class="hero-grid">
+    <div>
+      <div class="hero-eyebrow eyebrow reveal">
+        <span class="line"></span>
+        <span>Tejidos artesanales · Rosario · Desde 2011</span>
+      </div>
+      <h1 class="hero-title reveal reveal-delay-1">
+        Cada punto<br/>guarda <em>una historia</em>.
+      </h1>
+      <p class="hero-lede reveal reveal-delay-2">
+        Prendas tejidas a mano, en crochet y dos agujas. Diseños únicos, hechos a tu medida — con la calma y el cariño que sólo el tiempo puede dar.
+      </p>
+      <div class="hero-actions reveal reveal-delay-3">
+        <a href="tienda.html" class="btn btn-primary">
+          Explorar la tienda
+          <svg class="arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </a>
+        <a href="nosotros.html" class="btn btn-secondary">Conocé a Betina</a>
+      </div>
+
+      <div class="hero-stats reveal reveal-delay-3">
+        <div class="stat"><div class="num" data-count="14">0</div><div class="lbl">Años tejiendo</div></div>
+        <div class="stat"><div class="num" data-count="500" data-suffix="+">0</div><div class="lbl">Piezas únicas</div></div>
+        <div class="stat"><div class="num">100%</div><div class="lbl">Hecho a mano</div></div>
+      </div>
+    </div>
+
+    <div class="hero-visual reveal reveal-delay-2">
+      <div class="hero-card hero-card-1 placeholder-img">
+        <div class="placeholder-label">FOTO IG · Sweater terracota<br/>800 × 1000</div>
+      </div>
+      <div class="hero-card hero-card-2 placeholder-img" style="background: linear-gradient(135deg, #DBD7D3, #B7B0A9);">
+        <div class="placeholder-label">FOTO IG · Detalle tejido<br/>520 × 380</div>
+      </div>
+      <div class="hero-card hero-card-3 placeholder-img" style="background: linear-gradient(135deg, #CCDEEA, #93BAD4);">
+        <div class="placeholder-label">FOTO IG<br/>Manos tejiendo</div>
+      </div>
+      <div class="hero-tag tag-1">
+        <span class="pulse"></span>
+        <span>Pieza única · Edición limitada</span>
+      </div>
+      <div class="hero-tag tag-2" style="background: var(--accent);">
+        <span>Hecho con dos agujas</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==========  Marquee ========== -->
+<div class="marquee">
+  <div class="marquee-track">
+    <span><span>Cada prenda es única</span> <span class="dot"></span> <span>Hecho en Rosario</span> <span class="dot"></span> <span>Tejido a mano</span> <span class="dot"></span> <span>Lana natural</span> <span class="dot"></span> <span>Desde 2011</span> <span class="dot"></span> <span>A medida</span> <span class="dot"></span></span>
+    <span><span>Cada prenda es única</span> <span class="dot"></span> <span>Hecho en Rosario</span> <span class="dot"></span> <span>Tejido a mano</span> <span class="dot"></span> <span>Lana natural</span> <span class="dot"></span> <span>Desde 2011</span> <span class="dot"></span> <span>A medida</span> <span class="dot"></span></span>
+  </div>
+</div>
+
+<!-- ==========  Categories ========== -->
+<section class="cats" data-screen-label="02 Categorías">
+  <div class="container" style="margin-bottom: 48px;">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow reveal">— Colecciones</div>
+        <h2 class="reveal reveal-delay-1">Una para cada momento.</h2>
+      </div>
+      <p class="reveal reveal-delay-2">Tejidos pensados para abrazarte, regalar o decorar tu hogar. Todo se puede personalizar en color, talle y detalles — escribime y lo armamos juntas.</p>
+    </div>
+  </div>
+  <div class="cats-grid">
+    <a href="tienda.html?cat=sweaters" class="cat-tile reveal">
+      <div class="cat-bg placeholder-img" style="background: linear-gradient(135deg, var(--terracota-200), var(--terracota-700));">
+        <div class="placeholder-label" style="background:rgba(252,245,244,0.85)">FOTO · Sweater modelo<br/>vertical 4:5</div>
+      </div>
+      <div class="cat-tile-content">
+        <h3>Sweaters</h3>
+        <span class="cat-blurb">Calidez tejida para cada estación.</span>
+      </div>
+      <div class="cat-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg></div>
+    </a>
+    <a href="tienda.html?cat=cardigans" class="cat-tile reveal reveal-delay-1">
+      <div class="cat-bg placeholder-img" style="background: linear-gradient(135deg, var(--azul-300), var(--azul-700));">
+        <div class="placeholder-label">FOTO · Cardigan</div>
+      </div>
+      <div class="cat-tile-content">
+        <h3>Cardigans</h3>
+        <span class="cat-blurb">Capas suaves, hechas para abrazar.</span>
+      </div>
+      <div class="cat-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg></div>
+    </a>
+    <a href="tienda.html?cat=mantas" class="cat-tile reveal reveal-delay-2">
+      <div class="cat-bg placeholder-img" style="background: linear-gradient(135deg, var(--neutro-50), var(--neutro-300));">
+        <div class="placeholder-label">FOTO · Manta tejida</div>
+      </div>
+      <div class="cat-tile-content">
+        <h3>Mantas</h3>
+        <span class="cat-blurb">Texturas para descansar.</span>
+      </div>
+      <div class="cat-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg></div>
+    </a>
+    <a href="tienda.html?cat=accesorios" class="cat-tile reveal">
+      <div class="cat-bg placeholder-img" style="background: linear-gradient(135deg, var(--olivo-300), var(--olivo-900));">
+        <div class="placeholder-label" style="background:rgba(252,245,244,0.85)">FOTO · Bufanda/Gorro</div>
+      </div>
+      <div class="cat-tile-content">
+        <h3>Accesorios</h3>
+        <span class="cat-blurb">Bufandas, gorros, mitones.</span>
+      </div>
+      <div class="cat-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg></div>
+    </a>
+    <a href="tienda.html?cat=bebes" class="cat-tile reveal reveal-delay-1">
+      <div class="cat-bg placeholder-img" style="background: linear-gradient(135deg, #FCF5F4, var(--terracota-100));">
+        <div class="placeholder-label">FOTO · Bebé tejido</div>
+      </div>
+      <div class="cat-tile-content">
+        <h3>Bebés</h3>
+        <span class="cat-blurb">Primeras prendas, pura ternura.</span>
+      </div>
+      <div class="cat-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg></div>
+    </a>
+    <a href="tienda.html?cat=home" class="cat-tile reveal reveal-delay-2">
+      <div class="cat-bg placeholder-img" style="background: linear-gradient(135deg, var(--terracota-500), var(--olivo-700));">
+        <div class="placeholder-label" style="background:rgba(252,245,244,0.85)">FOTO · Almohadón/Tapiz</div>
+      </div>
+      <div class="cat-tile-content">
+        <h3>Living</h3>
+        <span class="cat-blurb">Almohadones, tapices, detalles.</span>
+      </div>
+      <div class="cat-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg></div>
+    </a>
+  </div>
+</section>
+
+<!-- ==========  Featured Products ========== -->
+<section class="section" data-screen-label="03 Destacados">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow reveal">— Lo nuevo de esta semana</div>
+        <h2 class="reveal reveal-delay-1">Recién salidos<br/>de las agujas.</h2>
+      </div>
+      <p class="reveal reveal-delay-2">Cada pieza se teje una sola vez. Si encontrás algo que te enamora, escribime para reservarlo o pedir tu versión personalizada.</p>
+    </div>
+    <div class="products-grid" id="featured-grid"></div>
+    <div style="text-align: center; margin-top: 64px;">
+      <a href="tienda.html" class="btn btn-secondary">
+        Ver toda la tienda
+        <svg class="arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ==========  Story ========== -->
+<section class="section" style="background: var(--bg-warm);" data-screen-label="04 Historia">
+  <div class="story">
+    <div class="story-img reveal">
+      <div class="placeholder-img">
+        <div class="placeholder-label">FOTO · Lili tejiendo<br/>retrato vertical 4:5</div>
+      </div>
+    </div>
+    <div class="story-content">
+      <div class="eyebrow reveal" style="color: var(--accent-deep);">— Sobre Lili</div>
+      <h2 class="reveal reveal-delay-1" style="margin-top: 16px;">El tejido es mi forma de meditar.</h2>
+      <p class="quote serif-italic reveal reveal-delay-2">"Tejer me lleva a la cocina de mi mamá, a las tardes con mi abuela. Ahora dejo una parte mía en cada prenda — la pienso para vos."</p>
+      <p class="reveal reveal-delay-3">Betina arrancó su emprendimiento en 2011 desde Rosario, con la convicción de que cada prenda merece tiempo, atención y cariño. Hoy son cientos de personas en Argentina que llevan puesta una pieza única, hecha a medida.</p>
+      <div class="story-signature reveal reveal-delay-3">— Lili Di Luzio</div>
+      <div style="margin-top: 32px;" class="reveal reveal-delay-3">
+        <a href="nosotros.html" class="btn btn-secondary">Leer mi historia</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==========  Process ========== -->
+<section class="process" data-screen-label="05 Proceso">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow reveal" style="color: var(--terracota-200);">— El proceso</div>
+        <h2 class="reveal reveal-delay-1">De la lana<br/>a tu puerta.</h2>
+      </div>
+      <p class="reveal reveal-delay-2">Pedir un tejido a Betina es entrar en un ritmo distinto. No hay producción masiva — hay tiempo, conversación y manos.</p>
+    </div>
+    <div class="process-steps">
+      <div class="step reveal">
+        <h4>Conversamos</h4>
+        <p>Me contás qué buscás, para quién, en qué color y talle. Si tenés una foto inspiradora, mejor.</p>
+      </div>
+      <div class="step reveal reveal-delay-1">
+        <h4>Diseño y materiales</h4>
+        <p>Elijo los hilados, te paso una propuesta y juntas confirmamos detalles, fecha y presupuesto.</p>
+      </div>
+      <div class="step reveal reveal-delay-2">
+        <h4>Tejido a mano</h4>
+        <p>Empieza el ritual. Cada prenda lleva entre 2 y 6 semanas, según complejidad y materiales.</p>
+      </div>
+      <div class="step reveal reveal-delay-3">
+        <h4>Llega a vos</h4>
+        <p>Coordinamos envío a todo el país o retiro en Rosario. La prenda viaja con instrucciones de cuidado.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==========  Press / IG ========== -->
+<section class="press" data-screen-label="06 Instagram">
+  <div class="press-eyebrow eyebrow">— @betina_di_luzio · Instagram</div>
+  <div class="container-narrow" style="margin-bottom: 48px;">
+    <h2 style="font-size: var(--t-h2);">Seguinos en el día a día.</h2>
+  </div>
+  <div class="ig-grid">
+    <a href="https://www.instagram.com/betina_di_luzio" target="_blank" class="ig-tile"><div class="placeholder-img" style="background: linear-gradient(135deg, var(--terracota-200), var(--terracota-700));"><div class="placeholder-label" style="font-size: 9px;">IG 1</div></div><div class="ig-overlay"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41-.56-.22-.96-.48-1.38-.9-.42-.42-.68-.82-.9-1.38-.16-.42-.36-1.06-.41-2.23C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16M12 0C8.74 0 8.33.01 7.05.07 5.78.13 4.9.33 4.14.63c-.78.3-1.45.71-2.12 1.38C1.35 2.68.94 3.35.64 4.14c-.3.75-.5 1.63-.56 2.91C.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.06 1.27.26 2.15.56 2.91.3.78.71 1.45 1.38 2.12.67.67 1.34 1.08 2.12 1.38.76.3 1.64.5 2.91.56C8.33 23.99 8.74 24 12 24s3.67-.01 4.95-.07c1.27-.06 2.15-.26 2.91-.56.78-.3 1.45-.71 2.12-1.38.67-.67 1.08-1.34 1.38-2.12.3-.76.5-1.64.56-2.91.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.06-1.27-.26-2.15-.56-2.91-.3-.78-.71-1.45-1.38-2.12C21.32 1.35 20.65.94 19.86.64c-.76-.3-1.64-.5-2.91-.56C15.67.01 15.26 0 12 0zm0 5.84A6.16 6.16 0 1 0 18.16 12 6.16 6.16 0 0 0 12 5.84zm0 10.16A4 4 0 1 1 16 12a4 4 0 0 1-4 4zm6.4-11.85a1.44 1.44 0 1 0 1.44 1.44 1.44 1.44 0 0 0-1.44-1.44z"/></svg></div></a>
+    <a href="https://www.instagram.com/betina_di_luzio" target="_blank" class="ig-tile"><div class="placeholder-img" style="background: linear-gradient(135deg, var(--azul-300), var(--azul-700));"><div class="placeholder-label" style="font-size: 9px;">IG 2</div></div><div class="ig-overlay"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="3"/></svg></div></a>
+    <a href="https://www.instagram.com/betina_di_luzio" target="_blank" class="ig-tile"><div class="placeholder-img" style="background: linear-gradient(135deg, var(--neutro-50), var(--neutro-300));"><div class="placeholder-label" style="font-size: 9px;">IG 3</div></div><div class="ig-overlay"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="3"/></svg></div></a>
+    <a href="https://www.instagram.com/betina_di_luzio" target="_blank" class="ig-tile"><div class="placeholder-img" style="background: linear-gradient(135deg, var(--olivo-300), var(--olivo-900));"><div class="placeholder-label" style="font-size: 9px;">IG 4</div></div><div class="ig-overlay"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="3"/></svg></div></a>
+    <a href="https://www.instagram.com/betina_di_luzio" target="_blank" class="ig-tile"><div class="placeholder-img" style="background: linear-gradient(135deg, #FCF5F4, var(--terracota-100));"><div class="placeholder-label" style="font-size: 9px;">IG 5</div></div><div class="ig-overlay"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="3"/></svg></div></a>
+    <a href="https://www.instagram.com/betina_di_luzio" target="_blank" class="ig-tile"><div class="placeholder-img" style="background: linear-gradient(135deg, var(--terracota-500), var(--olivo-700));"><div class="placeholder-label" style="font-size: 9px;">IG 6</div></div><div class="ig-overlay"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="3"/></svg></div></a>
+  </div>
+</section>
+
+<!-- ==========  CTA ========== -->
+<section class="cta-block" data-screen-label="07 CTA">
+  <div class="container">
+    <h2 class="serif reveal">¿Tenés algo en mente?</h2>
+    <p class="reveal reveal-delay-1">Pedidos a medida, regalos especiales, primera prenda de bebé. Escribime y armamos lo que imaginás.</p>
+    <div class="reveal reveal-delay-2">
+      <a href="https://wa.me/5493413003417?text=Hola%20Betina!%20Quer%C3%ADa%20pedirte%20un%20tejido%20personalizado." target="_blank" class="btn btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 0 1 8.413 3.488 11.824 11.824 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24z"/></svg>
+        Hablemos por WhatsApp
+      </a>
+    </div>
+  </div>
+</section>
+
+<div data-include="footer"></div>
+
+<script src="assets/data.js"></script>
+<script src="assets/shared.js"></script>
+<script src="assets/layout.js"></script>
+<script>
+window.BDLLayout.mount('home');
+// Featured grid
+(function(){
+  const grid = document.getElementById('featured-grid');
+  const featured = window.BDL_PRODUCTS.slice(0, 4);
+  grid.innerHTML = featured.map((p, i) => `
+    <a href="producto.html?id=${p.id}" class="product-card reveal reveal-delay-${i % 4}">
+      <div class="card-img">
+        ${p.status ? `<span class="badge ${p.status}">${p.status === 'new' ? 'Nuevo' : p.status === 'sale' ? 'Oferta' : 'Best seller'}</span>` : ''}
+        <div class="placeholder-img"><div class="placeholder-label">${p.placeholder}</div></div>
+        <button class="quick" onclick="event.preventDefault(); window.location='producto.html?id=${p.id}'">Vista rápida →</button>
+      </div>
+      <h4>${p.name}</h4>
+      <div class="meta">
+        <span>
+          ${p.oldPrice ? `<span class="old-price">${fmtARS(p.oldPrice)}</span>` : ''}
+          <span class="price">${fmtARS(p.price)}</span>
+        </span>
+        <span class="colors">${p.colors.map(c => `<span class="swatch" style="background:${c}"></span>`).join('')}</span>
+      </div>
+    </a>
+  `).join('');
+})();
+</script>
+<script>
+// Animated counter
+(function(){
+  const counters = document.querySelectorAll('[data-count]');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      io.unobserve(e.target);
+      const target = +e.target.dataset.count;
+      const suffix = e.target.dataset.suffix || '';
+      let cur = 0;
+      const step = target / 60;
+      const t = setInterval(() => {
+        cur += step;
+        if (cur >= target) { cur = target; clearInterval(t); }
+        e.target.textContent = Math.floor(cur) + suffix;
+      }, 22);
+    });
+  }, { threshold: 0.4 });
+  counters.forEach(c => io.observe(c));
+})();
+// Yarn path animation
+(function(){
+  const paths = document.querySelectorAll('.yarn-path');
+  paths.forEach((p, i) => {
+    const len = p.getTotalLength();
+    p.style.strokeDasharray = '4 8';
+    p.animate([
+      { strokeDashoffset: 0 },
+      { strokeDashoffset: -100 }
+    ], { duration: 8000 + i * 2000, iterations: Infinity });
+  });
+})();
+</script>
+</body>
+</html>

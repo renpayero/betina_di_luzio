@@ -1,0 +1,8 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import CategoryForm from '../../../components/admin/CategoryForm.astro';
+---
+
+<AdminLayout title="Nueva categoría" subtitle="Una categoría es un cajón conceptual del catálogo.">
+  <CategoryForm action="/api/admin/categorias/crear" submitLabel="Crear" isNew={true} />
+</AdminLayout>

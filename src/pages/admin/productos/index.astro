@@ -1,0 +1,177 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import AdminTabs from '../../../components/admin/AdminTabs.astro';
+import Tag from '../../../components/admin/Tag.astro';
+import IconAction from '../../../components/admin/IconAction.astro';
+import {
+  getAdminProducts,
+  getAdminProductsCountByStatus,
+  getCategories,
+  withHeroes,
+} from '../../../lib/queries.ts';
+import { fmtARS } from '../../../lib/format.ts';
+import type { AdminProductFilter } from '../../../lib/queries.ts';
+
+const params = Astro.url.searchParams;
+const view = params.get('view') ?? 'all';
+const q = params.get('q')?.trim() ?? '';
+const catFilter = params.get('cat') ?? 'all';
+
+const filter: AdminProductFilter = { q, categoryId: catFilter };
+if (view === 'active') filter.status = 'published';
+if (view === 'draft') filter.status = 'draft';
+if (view === 'sale') filter.status = 'sale';
+if (view === 'zero') filter.stockState = 'zero';
+
+const [productsRaw, counts, cats] = await Promise.all([
+  getAdminProducts(filter),
+  getAdminProductsCountByStatus(),
+  getCategories(),
+]);
+const products = await withHeroes(productsRaw);
+const catById = Object.fromEntries(cats.map((c) => [c.id, c.name]));
+
+const tabs = [
+  { label: 'Todos', href: '/admin/productos', count: counts.total, isActive: view === 'all' },
+  { label: 'Publicados', href: '/admin/productos?view=active', count: counts.published, isActive: view === 'active' },
+  { label: 'Borradores', href: '/admin/productos?view=draft', count: counts.draft, isActive: view === 'draft' },
+  { label: 'Sin stock', href: '/admin/productos?view=zero', count: counts.zero, isActive: view === 'zero' },
+  { label: 'En oferta', href: '/admin/productos?view=sale', count: counts.sale, isActive: view === 'sale' },
+];
+---
+
+<AdminLayout title="Productos" subtitle="Gestioná tu catálogo, stock y variantes.">
+  <AdminTabs tabs={tabs} />
+
+  <form class="toolbar" method="get" action="/admin/productos">
+    {view !== 'all' && <input type="hidden" name="view" value={view} />}
+    <input
+      type="search"
+      name="q"
+      value={q}
+      placeholder="Buscar por nombre, SKU, descripción…"
+      data-filter-rows
+      autocomplete="off"
+    />
+    <div class="right">
+      <select name="cat" data-filter-submit>
+        <option value="all" selected={catFilter === 'all'}>Todas las categorías</option>
+        {
+          cats.map((c) => (
+            <option value={c.id} selected={catFilter === c.id}>
+              {c.name}
+            </option>
+          ))
+        }
+      </select>
+      <button type="submit" class="btn-secondary" data-filter-hidden-on-auto>Filtrar</button>
+      <a href="/admin/productos/nuevo" class="btn-add">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 5v14M5 12h14" />
+        </svg>
+        Nuevo producto
+      </a>
+    </div>
+  </form>
+
+  <div class="panel" style="padding: 0;">
+    {
+      products.length === 0 ? (
+        <p style="padding:32px; color:var(--ink-soft); font-style:italic; text-align:center;">
+          No hay productos que coincidan. <a href="/admin/productos/nuevo" style="color:var(--accent-deep);">Crear el primero →</a>
+        </p>
+      ) : (
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>SKU</th>
+              <th>Categoría</th>
+              <th>Precio</th>
+              <th>Stock</th>
+              <th>Estado</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {products.map((p) => {
+              const isZero = p.stock === 0;
+              const isLow = !isZero && p.stock < p.minStock + 1;
+              const stockTone: 'red' | 'amber' | 'green' = isZero ? 'red' : isLow ? 'amber' : 'green';
+              const grad = `linear-gradient(135deg, ${p.colors[0] ?? '#CB674C'}, ${p.colors[p.colors.length - 1] ?? '#984C37'})`;
+              return (
+                <tr>
+                  <td>
+                    <div class="product-cell">
+                      {p.heroImage ? (
+                        <img src={p.heroImage} alt="" loading="lazy" class="product-cell-img" />
+                      ) : (
+                        <div class="img" style={`background: ${grad};`} />
+                      )}
+                      <div>
+                        <strong>{p.name}</strong>
+                        <br />
+                        <span style="font-family:var(--mono); font-size:11px; color:var(--ink-soft);">
+                          /{p.slug}
+                        </span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span style="font-family:var(--mono); font-size:12px;">{p.sku ?? '—'}</span>
+                  </td>
+                  <td>{catById[p.categoryId] ?? '—'}</td>
+                  <td>
+                    <span style="font-family:var(--mono);">{fmtARS(p.price)}</span>
+                    {p.oldPrice && (
+                      <span style="font-family:var(--mono); font-size:11px; color:var(--ink-soft); text-decoration:line-through; margin-left:6px;">
+                        {fmtARS(p.oldPrice)}
+                      </span>
+                    )}
+                  </td>
+                  <td>
+                    <Tag tone={stockTone}>{p.stock} u.</Tag>
+                  </td>
+                  <td>
+                    {p.isPublished ? (
+                      <Tag tone={p.status === 'sale' ? 'amber' : 'green'}>
+                        {p.status === 'new'
+                          ? 'Nuevo'
+                          : p.status === 'sale'
+                            ? 'En oferta'
+                            : p.status === 'bestseller'
+                              ? 'Top'
+                              : 'Activo'}
+                      </Tag>
+                    ) : (
+                      <Tag tone="gray">Borrador</Tag>
+                    )}
+                  </td>
+                  <td>
+                    <div class="actions-cell">
+                      <IconAction href={`/admin/productos/${p.id}/editar`} title="Editar" icon="edit" />
+                      <form method="post" action={`/api/admin/productos/${p.id}/duplicar`} style="display:inline;">
+                        <IconAction type="submit" title="Duplicar" icon="duplicate" />
+                      </form>
+                      <form
+                        method="post"
+                        action={`/api/admin/productos/${p.id}/eliminar`}
+                        style="display:inline;"
+                        data-confirm={`¿Eliminar “${p.name}”?`}
+                        data-confirm-message="Esta acción no se puede deshacer. Las imágenes asociadas también se borran del servidor."
+                        data-confirm-text="Eliminar"
+                        data-confirm-danger="true"
+                      >
+                        <IconAction type="submit" title="Eliminar" icon="delete" danger />
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      )
+    }
+  </div>
+</AdminLayout>

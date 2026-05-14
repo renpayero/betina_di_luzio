@@ -18,7 +18,7 @@ const {
 } = Astro.props;
 
 const canonicalUrl = new URL(Astro.url.pathname, SITE_URL).href;
-const ogImage = image ? absoluteUrl(image) : absoluteUrl('/og-default.png');
+const ogImage = image ? absoluteUrl(image) : absoluteUrl('/og-default.svg');
 const fullTitle = title.includes(BRAND.name)
   ? title
   : `${title} · ${BRAND.name}`;

@@ -1,0 +1,19 @@
+---
+import AdminLayout from '../../../../layouts/AdminLayout.astro';
+import CategoryForm from '../../../../components/admin/CategoryForm.astro';
+import { getCategoryById } from '../../../../lib/queries.ts';
+
+const { id } = Astro.params;
+if (!id) return Astro.redirect('/admin/categorias');
+const cat = await getCategoryById(id);
+if (!cat)
+  return Astro.redirect('/admin/categorias?err=1&msg=Categoría%20no%20encontrada.');
+---
+
+<AdminLayout title={`Editar · ${cat.name}`} subtitle="Cambiar nombre, descripción u orden.">
+  <CategoryForm
+    action={`/api/admin/categorias/${cat.id}/actualizar`}
+    category={cat}
+    submitLabel="Guardar cambios"
+  />
+</AdminLayout>

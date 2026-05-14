@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Nosotros · Betina Di Luzio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+<style>
+.about-hero { padding: 180px 0 100px; text-align: center; position: relative; overflow: hidden;}
+.about-hero .eyebrow { color: var(--accent-deep); margin-bottom: 24px; }
+.about-hero h1 { font-size: var(--t-display); line-height: 0.95; max-width: 1100px; margin: 0 auto;}
+.about-hero h1 em { font-style: italic; color: var(--accent-deep);}
+.about-hero .lede { font-family: var(--serif); font-size: 24px; font-style: italic; color: var(--ink-soft); max-width: 640px; margin: 32px auto 0; line-height: 1.5;}
+
+.portrait-row {
+  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;
+  max-width: 1440px; margin: 60px auto; padding: 0 var(--s-7);
+}
+.portrait-row > div { aspect-ratio: 3/4; position: relative; }
+.portrait-row > div .placeholder-img { position: absolute; inset: 0; }
+.portrait-row > div:nth-child(2) { transform: translateY(-32px); }
+
+.story-block { padding: var(--s-9) 0; max-width: 880px; margin: 0 auto; padding-left: var(--s-7); padding-right: var(--s-7);}
+.story-block h2 { font-size: var(--t-h2); margin-bottom: 32px;}
+.story-block h2 em { font-style: italic; color: var(--accent-deep); }
+.story-block p { font-size: 19px; line-height: 1.85; color: var(--ink-soft); margin-bottom: 24px; }
+.story-block .pullquote {
+  font-family: var(--serif); font-style: italic;
+  font-size: clamp(32px, 4vw, 48px); line-height: 1.25;
+  color: var(--ink); text-align: center;
+  margin: 64px 0;
+  position: relative;
+}
+.story-block .pullquote::before, .story-block .pullquote::after {
+  content: ""; display: block; width: 80px; height: 1px; background: var(--accent); margin: 24px auto;
+}
+
+.timeline {
+  background: var(--bg-warm);
+  padding: var(--s-10) 0;
+}
+.timeline-grid {
+  max-width: 1080px; margin: 0 auto; padding: 0 var(--s-7);
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+.timeline-item {
+  display: grid; grid-template-columns: 120px 1fr; gap: 48px;
+  padding: 36px 0;
+  border-bottom: 1px solid var(--line);
+  align-items: start;
+  transition: padding-left 0.4s;
+}
+.timeline-item:hover { padding-left: 12px; }
+.timeline-year { font-family: var(--serif); font-size: 48px; color: var(--accent-deep); line-height: 1; }
+.timeline-content h4 { font-family: var(--serif); font-size: 28px; margin-bottom: 8px; }
+.timeline-content p { color: var(--ink-soft); line-height: 1.7;}
+
+.values { padding: var(--s-10) 0;}
+.values-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; max-width: 1200px; margin: 0 auto; padding: 0 var(--s-7);}
+.value-card { padding: 40px; border: 1px solid var(--line); border-radius: 4px; background: var(--bg-card); transition: all 0.4s; }
+.value-card:hover { border-color: var(--accent); transform: translateY(-4px); box-shadow: 0 18px 40px rgba(54,22,14,0.08);}
+.value-card .num { font-family: var(--mono); color: var(--accent); font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 16px; }
+.value-card h4 { font-family: var(--serif); font-size: 28px; margin-bottom: 12px;}
+.value-card p { color: var(--ink-soft); line-height: 1.7;}
+
+@media (max-width: 800px) {
+  .portrait-row { grid-template-columns: 1fr 1fr; }
+  .portrait-row > div:nth-child(3) { display: none; }
+  .timeline-item { grid-template-columns: 1fr; gap: 16px;}
+  .values-grid { grid-template-columns: 1fr;}
+}
+</style>
+</head>
+<body>
+<div data-include="nav"></div>
+
+<section class="about-hero">
+  <div class="eyebrow reveal">— Sobre nosotras · desde 2011</div>
+  <h1 class="serif reveal reveal-delay-1">El tejido como<br/><em>forma de meditar.</em></h1>
+  <p class="lede reveal reveal-delay-2">Soy Lili Di Luzio. Tejer me llena de calma, me conecta con mi mamá y mi abuela, y me deja una parte mía en cada prenda.</p>
+</section>
+
+<div class="portrait-row">
+  <div class="reveal"><div class="placeholder-img" style="background: linear-gradient(135deg, var(--terracota-200), var(--terracota-700));"><div class="placeholder-label">FOTO · Lili tejiendo</div></div></div>
+  <div class="reveal reveal-delay-1"><div class="placeholder-img" style="background: linear-gradient(135deg, var(--neutro-50), var(--neutro-300));"><div class="placeholder-label">FOTO · Manos · detalle de hilo</div></div></div>
+  <div class="reveal reveal-delay-2"><div class="placeholder-img" style="background: linear-gradient(135deg, var(--azul-300), var(--azul-700));"><div class="placeholder-label">FOTO · Taller en Rosario</div></div></div>
+</div>
+
+<article class="story-block">
+  <h2 class="reveal serif">Tejer me lleva <em>a la infancia.</em></h2>
+  <p class="reveal reveal-delay-1">Mi mamá y mi abuela tejían. Las miraba durante horas, escuchaba el sonido tranquilo de las agujas, veía cómo de un ovillo aparecía una manta, un sweater, un regalo para alguien querido. Esa imagen se me quedó adentro para siempre.</p>
+  <p class="reveal reveal-delay-2">Cuando empecé Betina Di Luzio en 2011, lo hice como un ejercicio personal: tejer para volver a esa cocina, a esa siesta, a esa charla. Lo que empezó como meditación se transformó en un emprendimiento — pero el ritual sigue intacto.</p>
+
+  <p class="pullquote reveal">"Pienso en quién va a usar la prenda mientras tejo. Le voy poniendo una intención a cada vuelta."</p>
+
+  <p class="reveal">Hoy cada pedido es una conversación. Me contás para qué lo querés, para quién, qué color te llama. Yo elijo los hilados, te paso una propuesta y empezamos. Las prendas tardan entre dos y seis semanas — pero cada una llega con algo que la producción masiva no puede dar: tiempo.</p>
+  <p class="reveal reveal-delay-1">Si te gusta lo que ves, si tenés una idea, si querés regalar algo único — escribime. Me encanta diseñar a medida.</p>
+
+  <div style="text-align: center; margin-top: 56px;" class="reveal">
+    <a href="https://wa.me/5493413003417" target="_blank" class="btn btn-primary">
+      Hablemos por WhatsApp
+      <svg class="arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+    </a>
+  </div>
+</article>
+
+<section class="timeline">
+  <div class="container" style="max-width: 1080px;">
+    <div class="eyebrow reveal" style="text-align: center; margin-bottom: 16px; color: var(--accent-deep);">— Línea de tiempo</div>
+    <h2 class="serif reveal reveal-delay-1" style="text-align: center; font-size: var(--t-h2); margin-bottom: 64px;">Quince años de puntos.</h2>
+  </div>
+  <div class="timeline-grid">
+    <div class="timeline-item reveal"><div class="timeline-year">2011</div><div class="timeline-content"><h4>Las primeras agujas</h4><p>Empiezo a tejer prendas para amigas y familia. Pruebo puntos, hilados, técnicas. Lo que era hobby se vuelve oficio.</p></div></div>
+    <div class="timeline-item reveal"><div class="timeline-year">2014</div><div class="timeline-content"><h4>Primer pedido formal</h4><p>Una clienta de Buenos Aires me encarga seis sweaters para regalar. Acepto. Empiezan los pedidos por boca a boca.</p></div></div>
+    <div class="timeline-item reveal"><div class="timeline-year">2018</div><div class="timeline-content"><h4>Instagram & comunidad</h4><p>Abro la cuenta @betina_di_luzio. Empiezo a compartir el proceso. Llegan pedidos de todo el país.</p></div></div>
+    <div class="timeline-item reveal"><div class="timeline-year">2022</div><div class="timeline-content"><h4>Línea bebé</h4><p>Lanzo la línea para recién nacidos. Algodón pima orgánico, hipoalergénico — pensado para los más chiquitos.</p></div></div>
+    <div class="timeline-item reveal"><div class="timeline-year">2026</div><div class="timeline-content"><h4>Tienda online</h4><p>Esta misma página. Para que pidas más fácil, sigas el proceso, y descubras nuevas piezas cada semana.</p></div></div>
+  </div>
+</section>
+
+<section class="values">
+  <div class="container" style="max-width: 1200px;">
+    <div class="section-head" style="text-align: center; grid-template-columns: 1fr; margin-bottom: 64px;">
+      <div>
+        <div class="eyebrow reveal">— Lo que cuidamos</div>
+        <h2 class="serif reveal reveal-delay-1" style="font-size: var(--t-h2); margin-top: 16px;">Tres cosas, siempre.</h2>
+      </div>
+    </div>
+    <div class="values-grid">
+      <div class="value-card reveal"><div class="num">01</div><h4>Tiempo</h4><p>No producimos en serie. Cada prenda lleva el tiempo que necesita — usualmente entre 2 y 6 semanas. Eso es parte del valor.</p></div>
+      <div class="value-card reveal reveal-delay-1"><div class="num">02</div><h4>Honestidad</h4><p>Te cuento qué hilado uso, de dónde viene, cómo lo trabajo. Si algo no se puede hacer, te lo digo. Sin promesas vacías.</p></div>
+      <div class="value-card reveal reveal-delay-2"><div class="num">03</div><h4>Cariño</h4><p>Pienso en vos mientras tejo. Le pongo una intención a cada vuelta. La prenda llega con esa energía adentro.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-block" style="background: var(--accent); color: var(--bg); padding: var(--s-10) 0; text-align: center;">
+  <div class="container">
+    <h2 class="serif" style="font-size: var(--t-h1); color: var(--bg); max-width: 800px; margin: 0 auto 24px;">¿Empezamos un proyecto juntas?</h2>
+    <a href="contacto.html" class="btn btn-primary" style="background: var(--bg-deep); color: var(--bg);">Escribime</a>
+  </div>
+</section>
+
+<div data-include="footer"></div>
+
+<script src="assets/data.js"></script>
+<script src="assets/shared.js"></script>
+<script src="assets/layout.js"></script>
+<script>window.BDLLayout.mount('nosotros');</script>
+</body>
+</html>

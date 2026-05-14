@@ -2,8 +2,20 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PlaceholderImg from '../components/PlaceholderImg.astro';
 import { waLink } from '../lib/constants.ts';
+import { getContent, getContentImage } from '../lib/content.ts';
 
 const waUrl = waLink();
+
+const [aboutH1, aboutLede, portrait1, portrait2, portrait3] = await Promise.all([
+  getContent('about.h1', 'El tejido como <em>forma de meditar.</em>'),
+  getContent(
+    'about.lede',
+    'Soy Lili Di Luzio. Tejer me llena de calma, me conecta con mi mamá y mi abuela, y me deja una parte mía en cada prenda.'
+  ),
+  getContentImage('about.portrait1', null),
+  getContentImage('about.portrait2', null),
+  getContentImage('about.portrait3', null),
+]);
 
 const TIMELINE: Array<[string, string, string]> = [
   ['2011', 'Las primeras agujas', 'Empiezo a tejer prendas para amigas y familia. Pruebo puntos, hilados, técnicas. Lo que era hobby se vuelve oficio.'],
@@ -27,33 +39,40 @@ const VALUES: Array<[string, string, string]> = [
 >
   <section class="about-hero">
     <div class="eyebrow reveal">— Sobre nosotras · desde 2011</div>
-    <h1 class="serif reveal reveal-delay-1">
-      El tejido como<br /><em>forma de meditar.</em>
-    </h1>
-    <p class="lede reveal reveal-delay-2">
-      Soy Lili Di Luzio. Tejer me llena de calma, me conecta con mi mamá y mi
-      abuela, y me deja una parte mía en cada prenda.
-    </p>
+    <h1 class="serif reveal reveal-delay-1" set:html={aboutH1} />
+    <p class="lede reveal reveal-delay-2">{aboutLede}</p>
   </section>
 
   <div class="portrait-row">
     <div class="reveal">
-      <PlaceholderImg
-        label="FOTO · Lili tejiendo"
-        gradient="linear-gradient(135deg, var(--terracota-200), var(--terracota-700))"
-      />
+      {portrait1 ? (
+        <img src={portrait1} alt="Lili tejiendo" loading="lazy" decoding="async" class="portrait-img" />
+      ) : (
+        <PlaceholderImg
+          label="FOTO · Lili tejiendo"
+          gradient="linear-gradient(135deg, var(--terracota-200), var(--terracota-700))"
+        />
+      )}
     </div>
     <div class="reveal reveal-delay-1">
-      <PlaceholderImg
-        label="FOTO · Manos · detalle de hilo"
-        gradient="linear-gradient(135deg, var(--neutro-50), var(--neutro-300))"
-      />
+      {portrait2 ? (
+        <img src={portrait2} alt="Detalle de hilo" loading="lazy" decoding="async" class="portrait-img" />
+      ) : (
+        <PlaceholderImg
+          label="FOTO · Manos · detalle de hilo"
+          gradient="linear-gradient(135deg, var(--neutro-50), var(--neutro-300))"
+        />
+      )}
     </div>
     <div class="reveal reveal-delay-2">
-      <PlaceholderImg
-        label="FOTO · Taller en Rosario"
-        gradient="linear-gradient(135deg, var(--azul-300), var(--azul-700))"
-      />
+      {portrait3 ? (
+        <img src={portrait3} alt="Taller en Rosario" loading="lazy" decoding="async" class="portrait-img" />
+      ) : (
+        <PlaceholderImg
+          label="FOTO · Taller en Rosario"
+          gradient="linear-gradient(135deg, var(--azul-300), var(--azul-700))"
+        />
+      )}
     </div>
   </div>
 
@@ -221,6 +240,14 @@ const VALUES: Array<[string, string, string]> = [
   .portrait-row > div :global(.placeholder-img) {
     position: absolute;
     inset: 0;
+  }
+  .portrait-row > div :global(.portrait-img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
   }
   .portrait-row > div:nth-child(2) {
     transform: translateY(-32px);

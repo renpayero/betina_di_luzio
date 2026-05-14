@@ -1,0 +1,260 @@
+---
+import ImageInput from './ImageInput.astro';
+import type { Product, ProductImage } from '../../db/schema.ts';
+
+interface Props {
+  product: Product;
+  images: ProductImage[];
+}
+const { product, images } = Astro.props;
+---
+
+<section class="product-images" aria-label="Galería del producto">
+  <div class="product-images__head">
+    <h3>Galería de imágenes</h3>
+    <span class="product-images__count">{images.length} {images.length === 1 ? 'imagen' : 'imágenes'}</span>
+  </div>
+
+  {
+    images.length === 0 ? (
+      <p class="product-images__empty">
+        Todavía no hay imágenes. Subí la primera y se marcará como principal automáticamente.
+      </p>
+    ) : (
+      <div class="product-images__grid">
+        {images.map((img) => (
+          <article class:list={['product-images__card', { 'is-hero': img.isHero }]}>
+            <div class="product-images__thumb">
+              <img src={img.url} alt={img.alt} loading="lazy" decoding="async" />
+              {img.isHero && <span class="product-images__badge">Principal</span>}
+            </div>
+            <form
+              method="post"
+              action={`/api/admin/productos/${product.id}/imagenes/${img.id}/alt`}
+              class="product-images__alt"
+            >
+              <label>
+                <span>Alt</span>
+                <input type="text" name="alt" value={img.alt} maxlength="160" required />
+              </label>
+              <button type="submit" class="product-images__btn">Guardar</button>
+            </form>
+            <div class="product-images__row">
+              {!img.isHero && (
+                <form
+                  method="post"
+                  action={`/api/admin/productos/${product.id}/imagenes/${img.id}/hero`}
+                >
+                  <button type="submit" class="product-images__btn">Marcar principal</button>
+                </form>
+              )}
+              <form
+                method="post"
+                action={`/api/admin/productos/${product.id}/imagenes/${img.id}/eliminar`}
+                data-confirm="¿Eliminar esta imagen?"
+                data-confirm-message="Se borra del servidor y de la galería del producto."
+                data-confirm-text="Eliminar"
+                data-confirm-danger="true"
+              >
+                <button type="submit" class="product-images__btn product-images__btn--danger">
+                  Eliminar
+                </button>
+              </form>
+            </div>
+          </article>
+        ))}
+      </div>
+    )
+  }
+
+  <form
+    method="post"
+    action={`/api/admin/productos/${product.id}/imagenes/agregar`}
+    class="product-images__add"
+  >
+    <h4>Agregar imagen</h4>
+    <ImageInput
+      name="imageUrl"
+      section="product"
+      label="Subir foto"
+      aspectRatio="3 / 4"
+      help="JPG/PNG/WebP/AVIF, máx 4 MB. La primera imagen se marca como principal automáticamente."
+    />
+    <div class="field">
+      <label for={`alt-new-${product.id}`}>Alt (descripción para lectores de pantalla)</label>
+      <input
+        id={`alt-new-${product.id}`}
+        type="text"
+        name="alt"
+        maxlength="160"
+        placeholder={`${product.name} — vista frontal`}
+      />
+    </div>
+    <button type="submit" class="btn-add">Agregar a la galería</button>
+  </form>
+</section>
+
+<style>
+  .product-images {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+  .product-images__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  .product-images__head h3 {
+    font-family: var(--serif);
+    font-size: 22px;
+    margin: 0;
+  }
+  .product-images__count {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--ink-soft);
+  }
+  .product-images__empty {
+    color: var(--ink-soft);
+    font-style: italic;
+    margin: 0 0 24px;
+  }
+  .product-images__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .product-images__card {
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    overflow: hidden;
+    background: var(--bg-warm);
+    display: flex;
+    flex-direction: column;
+  }
+  .product-images__card.is-hero {
+    border-color: var(--accent-deep);
+    box-shadow: 0 0 0 1px var(--accent-deep);
+  }
+  .product-images__thumb {
+    position: relative;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    background: var(--bg-warm);
+  }
+  .product-images__thumb img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .product-images__badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: var(--accent-deep);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-family: var(--mono);
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+  }
+  .product-images__alt {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px;
+    border-bottom: 1px solid var(--line);
+    background: white;
+  }
+  .product-images__alt label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .product-images__alt label > span {
+    font-family: var(--mono);
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--ink-soft);
+  }
+  .product-images__alt input {
+    padding: 8px 10px;
+    font: inherit;
+    font-size: 12px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+  }
+  .product-images__row {
+    display: flex;
+    gap: 8px;
+    padding: 12px;
+    background: white;
+    flex-wrap: wrap;
+  }
+  .product-images__btn {
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    background: white;
+    border: 1px solid var(--line);
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .product-images__btn:hover {
+    border-color: var(--accent-deep);
+    color: var(--accent-deep);
+  }
+  .product-images__btn--danger {
+    color: var(--accent-deep);
+  }
+  .product-images__btn--danger:hover {
+    background: var(--accent-deep);
+    color: white;
+  }
+  .product-images__add {
+    border-top: 1px solid var(--line);
+    padding-top: 24px;
+    max-width: 480px;
+  }
+  .product-images__add h4 {
+    font-family: var(--serif);
+    font-size: 18px;
+    margin: 0 0 16px;
+  }
+  .product-images__add .field {
+    margin-bottom: 16px;
+  }
+  .product-images__add .field label {
+    display: block;
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--ink-soft);
+    margin-bottom: 4px;
+  }
+  .product-images__add .field input {
+    width: 100%;
+    padding: 10px 12px;
+    font: inherit;
+    font-size: 14px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+  }
+</style>

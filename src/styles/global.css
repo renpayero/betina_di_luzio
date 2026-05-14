@@ -472,6 +472,11 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 400; line-height: 1.05; let
 }
 .product-card .placeholder-img { position: absolute; inset: 0; transition: transform 1s cubic-bezier(0.22, 1, 0.36, 1); }
 .product-card:hover .placeholder-img { transform: scale(1.04); }
+.product-card .product-card-img {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block;
+  transition: transform 1s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.product-card:hover .product-card-img { transform: scale(1.04); }
 .product-card .badge {
   position: absolute; top: 12px; left: 12px; z-index: 3;
   font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em;

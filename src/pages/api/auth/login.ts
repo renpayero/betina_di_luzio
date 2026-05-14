@@ -8,23 +8,10 @@ import {
   createSession,
   verifyPassword,
 } from '../../../lib/auth.ts';
+import { isSameOrigin } from '../../../lib/csrf.ts';
+import { createRateLimit } from '../../../lib/rate-limit.ts';
 
-const RATE_WINDOW_MS = 60_000;
-const RATE_MAX_HITS = 5;
-const buckets = new Map<string, number[]>();
-
-const allowed = (ip: string): boolean => {
-  const now = Date.now();
-  const cutoff = now - RATE_WINDOW_MS;
-  const recent = (buckets.get(ip) ?? []).filter((t) => t > cutoff);
-  if (recent.length >= RATE_MAX_HITS) {
-    buckets.set(ip, recent);
-    return false;
-  }
-  recent.push(now);
-  buckets.set(ip, recent);
-  return true;
-};
+const limiter = createRateLimit('auth:login', 5);
 
 const trim = (raw: FormDataEntryValue | null): string =>
   typeof raw === 'string' ? raw.trim() : '';
@@ -56,9 +43,13 @@ const isSafeNext = (raw: string | null): string | null => {
 };
 
 export const POST: APIRoute = async ({ request, clientAddress, cookies, url }) => {
+  if (!isSameOrigin(request)) {
+    return new Response('Forbidden', { status: 403 });
+  }
+
   const ip = clientAddress ?? 'unknown';
 
-  if (!allowed(ip)) {
+  if (!limiter.allow(ip)) {
     return back(url, 'Demasiados intentos. Probá en un minuto.');
   }
 
@@ -72,7 +63,7 @@ export const POST: APIRoute = async ({ request, clientAddress, cookies, url }) =
   const email = trim(form.get('email')).toLowerCase();
   const password = trim(form.get('password'));
 
-  if (!EMAIL_RE.test(email) || password.length < 6) {
+  if (!EMAIL_RE.test(email) || password.length < 8) {
     return back(url, 'Datos incompletos.');
   }
 
@@ -94,6 +85,20 @@ export const POST: APIRoute = async ({ request, clientAddress, cookies, url }) =
   const session = await createSession(user.id);
   const prod = import.meta.env.PROD;
   cookies.set(SESSION_COOKIE, session.id, cookieOptions(prod));
+
+  const remember = form.get('remember');
+  const remembers = remember === 'on' || remember === 'true' || remember === '1';
+  if (remembers) {
+    cookies.set('bdl_remember_email', email, {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: prod,
+      path: '/',
+      maxAge: 60 * 60 * 24 * 30,
+    });
+  } else {
+    cookies.delete('bdl_remember_email', { path: '/' });
+  }
 
   const safeNext = isSafeNext(url.searchParams.get('next'));
   return new Response(null, {

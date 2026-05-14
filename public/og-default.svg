@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FCF5F4"/>
+      <stop offset="100%" stop-color="#F2E5E1"/>
+    </linearGradient>
+    <linearGradient id="brand" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#CB674C"/>
+      <stop offset="100%" stop-color="#A04A35"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <circle cx="980" cy="200" r="180" fill="url(#brand)" opacity="0.18"/>
+  <circle cx="220" cy="500" r="120" fill="#36160E" opacity="0.08"/>
+  <g transform="translate(120, 200)">
+    <text font-family="Georgia, 'Cormorant Garamond', serif" font-size="22" letter-spacing="6" fill="#36160E" text-transform="uppercase" opacity="0.6">— Tejidos hechos a mano</text>
+    <text y="120" font-family="Georgia, 'Cormorant Garamond', serif" font-size="120" font-style="italic" fill="#36160E">Betina</text>
+    <text y="240" font-family="Georgia, 'Cormorant Garamond', serif" font-size="72" fill="#CB674C">Di Luzio</text>
+    <text y="320" font-family="ui-monospace, 'Jetbrains Mono', monospace" font-size="20" letter-spacing="4" fill="#36160E" opacity="0.7">Rosario · Desde 2011</text>
+  </g>
+  <circle cx="980" cy="200" r="80" fill="url(#brand)"/>
+  <text x="980" y="232" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="100" fill="#FCF5F4">B</text>
+</svg>

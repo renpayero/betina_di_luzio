@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Contenido · Admin Betina Di Luzio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+<link rel="stylesheet" href="assets/admin.css">
+</head>
+<body>
+<div class="admin-shell">
+  <div data-include="admin-side"></div>
+  <main class="admin-main">
+    <div data-include="admin-header"></div>
+
+    <div class="tabs">
+      <button class="active">Banners de Home</button>
+      <button>Sección Nosotros</button>
+      <button>Footer</button>
+      <button>SEO</button>
+    </div>
+
+    <div class="row-2" style="grid-template-columns: 1fr 1fr;">
+      <div class="panel">
+        <div class="panel-head"><h3>Hero principal</h3><span class="tag green">Visible</span></div>
+        <div class="field"><label>Título (línea 1)</label><input type="text" value="Cada punto guarda" /></div>
+        <div class="field"><label>Título (línea 2 · cursiva)</label><input type="text" value="una historia." /></div>
+        <div class="field"><label>Subtítulo</label><textarea style="font-family: inherit; padding: 14px; border: 1px solid var(--line); border-radius: 4px; min-height: 80px;">Prendas tejidas a mano, en crochet y dos agujas. Diseños únicos, hechos a tu medida — con la calma y el cariño que sólo el tiempo puede dar.</textarea></div>
+        <div class="field-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div class="field"><label>CTA principal</label><input type="text" value="Explorar la tienda" /></div>
+          <div class="field"><label>CTA secundario</label><input type="text" value="Conocé a Betina" /></div>
+        </div>
+        <button class="btn-add" style="margin-top: 16px;">Guardar cambios</button>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h3>Galería del Hero</h3></div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div style="aspect-ratio: 3/4; background: linear-gradient(135deg, #E2927C, #984C37); border-radius: 4px; position: relative;">
+            <button style="position: absolute; top: 8px; right: 8px; background: rgba(252,245,244,0.9); border-radius: 50%; padding: 6px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 6h18M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+            </button>
+          </div>
+          <div style="aspect-ratio: 3/4; background: linear-gradient(135deg, #DBD7D3, #918B85); border-radius: 4px; position: relative;">
+            <button style="position: absolute; top: 8px; right: 8px; background: rgba(252,245,244,0.9); border-radius: 50%; padding: 6px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 6h18M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+            </button>
+          </div>
+          <div style="aspect-ratio: 3/4; background: linear-gradient(135deg, #CCDEEA, #93BAD4); border-radius: 4px; position: relative;">
+            <button style="position: absolute; top: 8px; right: 8px; background: rgba(252,245,244,0.9); border-radius: 50%; padding: 6px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 6h18M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+            </button>
+          </div>
+          <div style="aspect-ratio: 3/4; border: 2px dashed var(--line); border-radius: 4px; display: flex; align-items: center; justify-content: center; color: var(--ink-soft); font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; cursor: pointer;">+ Agregar</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top: 20px;">
+      <div class="panel-head"><h3>Marquee · Frase rotativa</h3></div>
+      <div class="field"><label>Frases (separadas por · )</label><textarea style="font-family: inherit; padding: 14px; border: 1px solid var(--line); border-radius: 4px; min-height: 80px;">Cada prenda es única · Hecho en Rosario · Tejido a mano · Lana natural · Desde 2011 · A medida</textarea></div>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px;">
+        <label style="display: flex; gap: 8px; align-items: center;"><input type="checkbox" checked /> Mostrar en home</label>
+        <button class="btn-add">Guardar</button>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top: 20px;">
+      <div class="panel-head"><h3>CTA inferior · "¿Tenés algo en mente?"</h3><span class="tag green">Visible</span></div>
+      <div class="field-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div class="field"><label>Color de fondo</label><select><option>Terracota (#CB674C)</option><option>Olivo (#595421)</option><option>Tinta (#36160E)</option></select></div>
+        <div class="field"><label>Posición</label><select><option>Antes del footer</option><option>Después del proceso</option></select></div>
+      </div>
+      <div class="field"><label>Título</label><input type="text" value="¿Tenés algo en mente?" /></div>
+      <div class="field"><label>Bajada</label><input type="text" value="Pedidos a medida, regalos especiales, primera prenda de bebé. Escribime y armamos lo que imaginás." /></div>
+    </div>
+  </main>
+</div>
+
+<script src="assets/data.js"></script>
+<script src="assets/admin-layout.js"></script>
+<script>window.BDLAdmin.mount('cont', 'Contenido', 'Editá banners, textos y secciones del sitio sin tocar código.');</script>
+</body>
+</html>

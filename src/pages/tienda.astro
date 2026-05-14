@@ -4,7 +4,7 @@ import ProductCard from '../components/ProductCard.astro';
 import {
   getCategories,
   getCategoryCounts,
-  getProducts,
+  getProductsWithHero,
   type ProductFilter,
 } from '../lib/queries.ts';
 import { colorName } from '../lib/colors.ts';
@@ -43,8 +43,8 @@ if (sizesParam.length > 0) filter.sizes = sizesParam;
 const [allCategories, counts, list, totalProducts] = await Promise.all([
   getCategories(),
   getCategoryCounts(),
-  getProducts(filter),
-  getProducts({}).then((p) => p.length),
+  getProductsWithHero(filter),
+  getProductsWithHero({}).then((p) => p.length),
 ]);
 
 const buildUrl = (params: Record<string, string | null>): string => {
@@ -216,7 +216,7 @@ const SIZES = [
     <section aria-label="Productos">
       <div class="shop-toolbar">
         <div class="toolbar-left">
-          <span class="count">{list.length} piezas</span>
+          <span class="count">{list.length} {list.length === 1 ? 'pieza' : 'piezas'}</span>
           {
             hasActiveFilters && (
               <a class="clear-filters" href="/tienda">

@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ProductCard from '../components/ProductCard.astro';
-import { getProducts } from '../lib/queries.ts';
+import { getProductsWithHero } from '../lib/queries.ts';
 import type { Product } from '../db/schema.ts';
 
 const url = Astro.url;
@@ -11,7 +11,7 @@ const hasQuery = q.length > 0;
 
 let results: Product[] = [];
 if (hasQuery) {
-  results = await getProducts({ q });
+  results = await getProductsWithHero({ q });
 }
 
 const description = hasQuery
@@ -28,7 +28,7 @@ const description = hasQuery
     <div class="container">
       <div class="eyebrow">— Buscador</div>
       <h1 class="serif">
-        ¿Qué estás<br /><em>buscando hoy?</em>
+        ¿Qué estás <br /><em>buscando hoy?</em>
       </h1>
       <form
         class="search-form"

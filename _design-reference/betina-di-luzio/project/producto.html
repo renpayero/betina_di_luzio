@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Producto · Betina Di Luzio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+<style>
+.pdp { padding: 130px var(--s-7) var(--s-9); max-width: 1440px; margin: 0 auto; }
+.breadcrumb { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--ink-soft); margin-bottom: 32px; }
+.breadcrumb a { color: var(--ink-soft); }
+.breadcrumb a:hover { color: var(--accent); }
+.pdp-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 80px; align-items: start; }
+.gallery { display: grid; grid-template-columns: 100px 1fr; gap: 16px; position: sticky; top: 110px; }
+.gallery-thumbs { display: flex; flex-direction: column; gap: 12px; }
+.gallery-thumbs .thumb { aspect-ratio: 3/4; cursor: none; opacity: 0.5; transition: opacity 0.3s; position: relative; overflow: hidden; }
+.gallery-thumbs .thumb.active { opacity: 1; }
+.gallery-thumbs .thumb .placeholder-img { position: absolute; inset: 0;}
+.gallery-main { aspect-ratio: 3/4; position: relative; overflow: hidden;}
+.gallery-main .placeholder-img { position: absolute; inset: 0; }
+.pdp-info h1 { font-size: var(--t-h2); margin: 16px 0 24px; line-height: 1.05;}
+.pdp-info .price-row { display: flex; align-items: baseline; gap: 12px; margin-bottom: 32px; }
+.pdp-info .price { font-family: var(--mono); font-size: 22px; }
+.pdp-info .old { font-family: var(--mono); font-size: 14px; color: var(--ink-mute); text-decoration: line-through; }
+.pdp-info .desc { font-family: var(--serif); font-size: 19px; line-height: 1.6; color: var(--ink-soft); margin-bottom: 32px; }
+
+.option-block { margin-bottom: 28px; }
+.option-block h5 { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.18em; color: var(--ink-soft); margin-bottom: 12px; display: flex; justify-content: space-between;}
+.option-block .selected { color: var(--ink); font-weight: 500;}
+.colors-row { display: flex; gap: 12px; }
+.color-opt { width: 40px; height: 40px; border-radius: 50%; cursor: none; position: relative; border: 1px solid var(--line); transition: transform 0.2s; }
+.color-opt:hover { transform: scale(1.1); }
+.color-opt.active::after { content: ""; position: absolute; inset: -5px; border-radius: 50%; border: 1.5px solid var(--accent);}
+.sizes-row { display: flex; gap: 8px; }
+.size-opt { padding: 12px 18px; border: 1px solid var(--line); border-radius: 4px; font-family: var(--mono); font-size: 12px; cursor: none; transition: all 0.2s;}
+.size-opt:hover, .size-opt.active { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.qty-row { display: flex; align-items: center; gap: 16px; margin-bottom: 32px; }
+.qty-ctrl { display: flex; align-items: center; gap: 0; border: 1px solid var(--line); border-radius: 4px;}
+.qty-ctrl button { width: 40px; height: 44px; cursor: none; }
+.qty-ctrl button:hover { background: var(--bg-warm); }
+.qty-ctrl span { width: 40px; text-align: center; font-family: var(--mono); }
+.add-row { display: flex; gap: 12px; margin-bottom: 24px; }
+.add-row .btn-primary { flex: 1; justify-content: center; padding: 18px; }
+.btn-icon { width: 56px; height: 56px; border-radius: 999px; border: 1px solid var(--ink); display: flex; align-items: center; justify-content: center;}
+.btn-icon:hover { background: var(--ink); color: var(--bg);}
+.wa-pdp { width: 100%; padding: 14px; background: #25D366; color: white; border-radius: 999px; display: flex; align-items: center; justify-content: center; gap: 10px; font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.18em; transition: background 0.2s;}
+.wa-pdp:hover { background: #1FB959; }
+.wa-pdp svg { width: 16px; height: 16px; fill: currentColor;}
+
+.specs { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 32px;}
+.spec-item { display: flex; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid var(--line-soft); }
+.spec-item dt { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--ink-soft); }
+.spec-item dd { font-size: 14px; }
+
+.related { margin-top: 120px; }
+.related h2 { font-size: var(--t-h2); margin-bottom: 48px; text-align: center; }
+
+@media (max-width: 1000px) { .pdp-grid { grid-template-columns: 1fr; } .gallery { position: static; } }
+</style>
+</head>
+<body>
+<div data-include="nav"></div>
+
+<main class="pdp">
+  <div class="breadcrumb"><a href="index.html">Inicio</a> · <a href="tienda.html">Tienda</a> · <span id="bc-cat"></span> · <span id="bc-name"></span></div>
+  <div class="pdp-grid">
+    <div class="gallery">
+      <div class="gallery-thumbs" id="thumbs"></div>
+      <div class="gallery-main">
+        <div class="placeholder-img" id="main-img"><div class="placeholder-label" id="main-label"></div></div>
+      </div>
+    </div>
+    <div class="pdp-info">
+      <div class="eyebrow" id="status-badge"></div>
+      <h1 class="serif" id="name"></h1>
+      <div class="price-row">
+        <span class="price" id="price"></span>
+        <span class="old" id="old-price"></span>
+        <span class="mono" style="color:var(--accent-deep);" id="discount"></span>
+      </div>
+      <p class="desc" id="desc"></p>
+
+      <div class="option-block">
+        <h5>Color · <span class="selected" id="sel-color"></span></h5>
+        <div class="colors-row" id="colors-row"></div>
+      </div>
+
+      <div class="option-block">
+        <h5>Talle · <span class="selected" id="sel-size"></span></h5>
+        <div class="sizes-row" id="sizes-row"></div>
+      </div>
+
+      <div class="qty-row">
+        <span class="mono" style="color: var(--ink-soft);">Cantidad</span>
+        <div class="qty-ctrl">
+          <button id="qty-minus">−</button>
+          <span id="qty">1</span>
+          <button id="qty-plus">+</button>
+        </div>
+        <span class="mono" style="color: var(--ink-soft);" id="stock-msg"></span>
+      </div>
+
+      <div class="add-row">
+        <button class="btn btn-primary" id="add-cart">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 7h12l-1.5 11.5a2 2 0 0 1-2 1.5h-5a2 2 0 0 1-2-1.5L6 7z"/><path d="M9 7V5a3 3 0 0 1 6 0v2"/></svg>
+          Agregar al carrito
+        </button>
+        <button class="btn-icon" title="Favoritos">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </button>
+      </div>
+
+      <a href="#" class="wa-pdp" id="wa-link">
+        <svg viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 0 1 8.413 3.488 11.824 11.824 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24z"/></svg>
+        Consultar por WhatsApp
+      </a>
+
+      <dl class="specs" id="specs"></dl>
+    </div>
+  </div>
+
+  <section class="related">
+    <h2 class="serif">También te puede gustar</h2>
+    <div id="related-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;"></div>
+  </section>
+</main>
+
+<div data-include="footer"></div>
+
+<script src="assets/data.js"></script>
+<script src="assets/shared.js"></script>
+<script src="assets/layout.js"></script>
+<script>
+window.BDLLayout.mount('tienda');
+
+const id = new URLSearchParams(location.search).get('id') || 'p01';
+const p = window.BDLgetProduct(id) || window.BDL_PRODUCTS[0];
+
+document.title = p.name + ' · Betina Di Luzio';
+document.getElementById('bc-cat').textContent = window.BDL_CATEGORIES.find(c => c.id === p.cat)?.name || '';
+document.getElementById('bc-name').textContent = p.name;
+document.getElementById('name').textContent = p.name;
+document.getElementById('price').textContent = fmtARS(p.price);
+if (p.oldPrice) {
+  document.getElementById('old-price').textContent = fmtARS(p.oldPrice);
+  document.getElementById('discount').textContent = '−' + Math.round((1 - p.price/p.oldPrice)*100) + '%';
+}
+document.getElementById('desc').textContent = p.desc;
+const statusBadge = document.getElementById('status-badge');
+if (p.status) statusBadge.textContent = '— ' + (p.status === 'new' ? 'Nuevo' : p.status === 'sale' ? 'En oferta' : 'Más vendido');
+
+document.getElementById('main-label').textContent = p.placeholder;
+
+// Thumbs (4 placeholders)
+const thumbs = document.getElementById('thumbs');
+['Vista frontal', 'Detalle del punto', 'Modelo en uso', 'Espalda'].forEach((label, i) => {
+  const t = document.createElement('div');
+  t.className = 'thumb' + (i === 0 ? ' active' : '');
+  t.innerHTML = `<div class="placeholder-img" style="background: linear-gradient(135deg, ${p.colors[i % p.colors.length]}40, ${p.colors[i % p.colors.length]}90);"><div class="placeholder-label" style="font-size:9px">${label}</div></div>`;
+  t.addEventListener('click', () => {
+    thumbs.querySelectorAll('.thumb').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+  });
+  thumbs.appendChild(t);
+});
+
+// Colors
+let selColor = p.colors[0];
+const colorNames = { '#CB674C': 'Terracota', '#36160E': 'Tinta', '#FCF5F4': 'Crema', '#6C95B0': 'Azul polvo', '#595421': 'Olivo', '#DBD7D3': 'Crudo', '#1E2D37': 'Noche', '#984C37': 'Cobre', '#653022': 'Borgoña', '#EEC5BA': 'Rosa pálido', '#CCDEEA': 'Cielo', '#B7B0A9': 'Piedra', '#4D4A47': 'Carbón'};
+document.getElementById('sel-color').textContent = colorNames[selColor] || selColor;
+const colorsRow = document.getElementById('colors-row');
+p.colors.forEach((c, i) => {
+  const b = document.createElement('button');
+  b.className = 'color-opt' + (i === 0 ? ' active' : '');
+  b.style.background = c;
+  b.title = colorNames[c] || c;
+  b.addEventListener('click', () => {
+    colorsRow.querySelectorAll('.color-opt').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    selColor = c;
+    document.getElementById('sel-color').textContent = colorNames[c] || c;
+  });
+  colorsRow.appendChild(b);
+});
+
+// Sizes
+let selSize = p.sizes[0];
+document.getElementById('sel-size').textContent = selSize;
+const sizesRow = document.getElementById('sizes-row');
+p.sizes.forEach((s, i) => {
+  const b = document.createElement('button');
+  b.className = 'size-opt' + (i === 0 ? ' active' : '');
+  b.textContent = s;
+  b.addEventListener('click', () => {
+    sizesRow.querySelectorAll('.size-opt').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    selSize = s;
+    document.getElementById('sel-size').textContent = s;
+  });
+  sizesRow.appendChild(b);
+});
+
+// Qty
+let qty = 1;
+const qtyEl = document.getElementById('qty');
+document.getElementById('qty-minus').addEventListener('click', () => { if (qty > 1) qty--; qtyEl.textContent = qty; });
+document.getElementById('qty-plus').addEventListener('click', () => { if (qty < p.stock) qty++; qtyEl.textContent = qty; });
+document.getElementById('stock-msg').textContent = p.stock <= 3 ? `Sólo ${p.stock} disponibles` : 'En stock';
+if (p.stock <= 3) document.getElementById('stock-msg').style.color = 'var(--accent-deep)';
+
+// Specs
+document.getElementById('specs').innerHTML = `
+  <div class="spec-item"><dt>Material</dt><dd>${p.materials}</dd></div>
+  <div class="spec-item"><dt>Tejido</dt><dd>A mano · 2 agujas / crochet</dd></div>
+  <div class="spec-item"><dt>Hecho en</dt><dd>Rosario, Santa Fe</dd></div>
+  <div class="spec-item"><dt>Tiempo</dt><dd>2 — 6 semanas</dd></div>
+  <div class="spec-item"><dt>Cuidado</dt><dd><a href="cuidados.html" style="text-decoration: underline; color: var(--accent-deep);">Ver instrucciones</a></dd></div>
+`;
+
+// Add to cart
+document.getElementById('add-cart').addEventListener('click', () => {
+  window.BDLCart.add({ id: p.id, name: p.name, price: p.price, color: selColor, size: selSize, qty, placeholder: p.placeholder });
+  const btn = document.getElementById('add-cart');
+  const orig = btn.innerHTML;
+  btn.innerHTML = '✓ Agregado al carrito';
+  btn.style.background = 'var(--accent-olive)';
+  setTimeout(() => { btn.innerHTML = orig; btn.style.background = ''; }, 1800);
+});
+
+// WhatsApp
+const waText = encodeURIComponent(`Hola Betina! Me interesa ${p.name} (${selSize} · ${colorNames[selColor]}). ¿Está disponible?`);
+document.getElementById('wa-link').href = `https://wa.me/5493413003417?text=${waText}`;
+
+// Related
+const related = window.BDL_PRODUCTS.filter(x => x.id !== p.id && x.cat === p.cat).slice(0, 4);
+const fillers = window.BDL_PRODUCTS.filter(x => x.id !== p.id && !related.includes(x)).slice(0, 4 - related.length);
+document.getElementById('related-grid').innerHTML = [...related, ...fillers].slice(0, 4).map(rp => `
+  <a href="producto.html?id=${rp.id}" class="product-card">
+    <div class="card-img" style="aspect-ratio: 3/4; overflow: hidden; position: relative; margin-bottom: 16px; background: var(--bg-warm);">
+      <div class="placeholder-img" style="position:absolute;inset:0;"><div class="placeholder-label">${rp.placeholder}</div></div>
+    </div>
+    <h4 style="font-family: var(--serif); font-size: 19px;">${rp.name}</h4>
+    <div class="meta" style="display:flex; justify-content: space-between; align-items: center;">
+      <span class="price mono" style="font-size: 13px;">${fmtARS(rp.price)}</span>
+      <span class="colors" style="display:flex; gap: 4px;">${rp.colors.map(c => `<span class="swatch" style="width: 12px; height: 12px; border-radius: 50%; background:${c};"></span>`).join('')}</span>
+    </div>
+  </a>
+`).join('');
+</script>
+</body>
+</html>

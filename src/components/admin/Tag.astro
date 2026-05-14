@@ -1,0 +1,12 @@
+---
+type Tone = 'green' | 'amber' | 'red' | 'gray';
+interface Props {
+  tone?: Tone;
+  class?: string;
+}
+const { tone = 'gray', class: className = '' } = Astro.props;
+---
+
+<span class:list={['tag', tone, className]}>
+  <slot />
+</span>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Stock · Admin Betina Di Luzio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+<link rel="stylesheet" href="assets/admin.css">
+</head>
+<body>
+<div class="admin-shell">
+  <div data-include="admin-side"></div>
+  <main class="admin-main">
+    <div data-include="admin-header"></div>
+
+    <section class="kpis">
+      <div class="kpi-card"><div class="label">Total unidades</div><div class="num">68</div><div class="delta">en 12 productos</div></div>
+      <div class="kpi-card"><div class="label">Stock crítico</div><div class="num" style="color:var(--accent-deep);">5</div><div class="delta down">≤ 2 unidades</div></div>
+      <div class="kpi-card"><div class="label">Reposición sugerida</div><div class="num">8</div><div class="delta">productos</div></div>
+      <div class="kpi-card"><div class="label">Valor inventario</div><div class="num">$5.6M</div><div class="delta up">▲ vs mes pasado</div></div>
+    </section>
+
+    <div class="toolbar">
+      <input type="search" placeholder="Buscar producto, SKU, color..." />
+      <div style="display: flex; gap: 8px;">
+        <select style="padding: 10px 14px; font: inherit; font-size: 14px; border: 1px solid var(--line); border-radius: 4px; background: white;">
+          <option>Todos los estados</option><option>Crítico</option><option>Bajo</option><option>OK</option>
+        </select>
+        <button class="btn-add">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          Ingresar stock
+        </button>
+      </div>
+    </div>
+
+    <div class="panel" style="padding: 0;">
+      <table class="table">
+        <thead><tr><th>Producto</th><th>SKU</th><th>Variante</th><th>Stock actual</th><th>Mínimo</th><th>Estado</th><th>Última actualización</th></tr></thead>
+        <tbody id="stockrows"></tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<script src="assets/data.js"></script>
+<script src="assets/admin-layout.js"></script>
+<script>
+window.BDLAdmin.mount('stock', 'Stock · Inventario', 'Controlá unidades por talle y color en tiempo real.');
+const variants = [];
+window.BDL_PRODUCTS.forEach((p, i) => {
+  p.sizes.forEach(s => {
+    p.colors.forEach(c => {
+      variants.push({ name: p.name, sku: p.cat.slice(0,2).toUpperCase()+'-'+String(i+1).padStart(3,'0')+'-'+s+'-'+c.replace('#',''), size: s, color: c, stock: Math.max(0, p.stock + (Math.random()*4-2|0)), min: 2 });
+    });
+  });
+});
+const colorNames = { '#CB674C': 'Terracota', '#36160E': 'Tinta', '#FCF5F4': 'Crema', '#6C95B0': 'Azul polvo', '#595421': 'Olivo', '#DBD7D3': 'Crudo', '#1E2D37': 'Noche', '#984C37': 'Cobre', '#653022': 'Borgoña', '#EEC5BA': 'Rosa', '#CCDEEA': 'Cielo', '#B7B0A9': 'Piedra', '#4D4A47': 'Carbón'};
+document.getElementById('stockrows').innerHTML = variants.slice(0, 18).map(v => `
+  <tr>
+    <td><strong>${v.name}</strong></td>
+    <td><span style="font-family:var(--mono); font-size: 11px;">${v.sku}</span></td>
+    <td><span style="font-family:var(--mono); font-size:11px;"><span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:${v.color}; vertical-align:middle; margin-right:6px; border:1px solid rgba(0,0,0,0.1);"></span>${colorNames[v.color]||v.color} · ${v.size}</span></td>
+    <td><strong style="font-family:var(--mono); font-size: 16px;">${v.stock}</strong></td>
+    <td><span style="color:var(--ink-soft); font-family:var(--mono); font-size: 12px;">${v.min}</span></td>
+    <td><span class="tag ${v.stock===0?'red':v.stock<=v.min?'amber':'green'}">${v.stock===0?'Sin stock':v.stock<=v.min?'Bajo':'OK'}</span></td>
+    <td><span style="color:var(--ink-soft); font-family:var(--mono); font-size: 11px;">hace ${(Math.random()*12+1)|0} días</span></td>
+  </tr>
+`).join('');
+</script>
+</body>
+</html>

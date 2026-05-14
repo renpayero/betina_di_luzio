@@ -1,7 +1,12 @@
 import type { APIRoute } from 'astro';
 import { SESSION_COOKIE, destroySession } from '../../../lib/auth.ts';
+import { isSameOrigin } from '../../../lib/csrf.ts';
 
-export const POST: APIRoute = async ({ cookies }) => {
+export const POST: APIRoute = async ({ request, cookies }) => {
+  if (!isSameOrigin(request)) {
+    return new Response('Forbidden', { status: 403 });
+  }
+
   const sid = cookies.get(SESSION_COOKIE)?.value;
   if (sid) {
     await destroySession(sid);

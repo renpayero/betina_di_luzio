@@ -1,0 +1,65 @@
+---
+import type { Category } from '../../db/schema.ts';
+import ImageInput from './ImageInput.astro';
+
+interface Props {
+  action: string;
+  category?: Category | null;
+  submitLabel: string;
+  isNew?: boolean;
+}
+const { action, category, submitLabel, isNew = false } = Astro.props;
+const c = category;
+---
+
+<form method="post" action={action} class="form-card">
+  <div class="field-row">
+    <div class="field">
+      <label for="name">Nombre</label>
+      <input type="text" id="name" name="name" value={c?.name ?? ''} required maxlength="60" />
+    </div>
+    <div class="field">
+      <label for="slug">Slug</label>
+      <input type="text" id="slug" name="slug" value={c?.slug ?? ''} placeholder="auto" maxlength="40" required={!isNew} />
+      <span class="help">URL: /tienda?cat=&lt;slug&gt;</span>
+    </div>
+  </div>
+
+  {
+    isNew && (
+      <div class="field">
+        <label for="id">ID interno</label>
+        <input type="text" id="id" name="id" placeholder="ej: sweaters" maxlength="40" required />
+        <span class="help">Identificador estable. No se puede cambiar después.</span>
+      </div>
+    )
+  }
+
+  <div class="field">
+    <label for="blurb">Descripción corta</label>
+    <input type="text" id="blurb" name="blurb" value={c?.blurb ?? ''} required maxlength="120" placeholder="Calidez tejida para cada estación." />
+  </div>
+
+  <div class="field-row">
+    <div class="field">
+      <label for="sortOrder">Orden</label>
+      <input type="number" id="sortOrder" name="sortOrder" value={c?.sortOrder ?? 99} min="0" max="999" />
+    </div>
+  </div>
+
+  <ImageInput
+    name="imageUrl"
+    initialUrl={c?.imageUrl ?? ''}
+    section="category"
+    label="Imagen de portada (4:5)"
+    aspectRatio="4 / 5"
+    help="Aparece en el tile de la home. JPG/PNG/WebP/AVIF, máx 4 MB."
+  />
+
+  <div class="form-actions">
+    <a href="/admin/categorias" class="btn-secondary">← Cancelar</a>
+    <div class="right">
+      <button type="submit" class="btn-add">{submitLabel}</button>
+    </div>
+  </div>
+</form>

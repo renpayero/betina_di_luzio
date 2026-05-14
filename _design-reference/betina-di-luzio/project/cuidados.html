@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cuidado del tejido · Betina Di Luzio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+<style>
+.care-hero { padding: 160px 0 60px; text-align: center; }
+.care-hero h1 { font-size: var(--t-h1); margin-top: 16px;}
+.care-hero h1 em { font-style: italic; color: var(--accent-deep);}
+.care-hero p { font-family: var(--serif); font-style: italic; font-size: 22px; color: var(--ink-soft); margin-top: 16px; max-width: 640px; margin-left: auto; margin-right: auto;}
+
+.care-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 32px; max-width: 1200px; margin: 60px auto; padding: 0 var(--s-7);}
+.care-card { padding: 48px; border: 1px solid var(--line); background: var(--bg-card); border-radius: 4px; transition: all 0.4s;}
+.care-card:hover { border-color: var(--accent); transform: translateY(-4px); }
+.care-card .ico { width: 56px; height: 56px; border-radius: 50%; background: var(--bg-warm); display: flex; align-items: center; justify-content: center; margin-bottom: 24px;}
+.care-card .ico svg { width: 24px; height: 24px; fill: none; stroke: var(--accent-deep); stroke-width: 1.5;}
+.care-card h3 { font-family: var(--serif); font-size: 28px; margin-bottom: 12px;}
+.care-card p { color: var(--ink-soft); line-height: 1.7;}
+.care-card ul { list-style: none; margin-top: 16px;}
+.care-card li { padding: 6px 0; padding-left: 24px; position: relative; color: var(--ink-soft);}
+.care-card li::before { content: ""; position: absolute; left: 0; top: 14px; width: 12px; height: 1px; background: var(--accent);}
+
+.dont-card { background: var(--terracota-50); border-color: var(--terracota-200);}
+.dont-card .ico { background: white;}
+.dont-card .ico svg { stroke: var(--accent);}
+
+.tips { background: var(--bg-deep); color: var(--bg); padding: var(--s-10) 0;}
+.tips .container { max-width: 880px; padding: 0 var(--s-7);}
+.tips h2 { color: var(--bg); font-size: var(--t-h2); margin-bottom: 48px;}
+.tips-list { list-style: none; counter-reset: tip;}
+.tips-list li { padding: 24px 0; border-top: 1px solid rgba(252,245,244,0.15); display: grid; grid-template-columns: 80px 1fr; gap: 32px; align-items: start;}
+.tips-list li::before { counter-increment: tip; content: "0" counter(tip); font-family: var(--mono); color: var(--terracota-200); letter-spacing: 0.2em;}
+.tips-list h4 { font-family: var(--serif); font-size: 24px; margin-bottom: 8px;}
+.tips-list p { color: rgba(252,245,244,0.7); line-height: 1.7;}
+@media (max-width: 800px) { .care-grid { grid-template-columns: 1fr;} }
+</style>
+</head>
+<body>
+<div data-include="nav"></div>
+
+<section class="care-hero">
+  <div class="eyebrow reveal">— Cuidado del tejido</div>
+  <h1 class="serif reveal reveal-delay-1">Para que tu prenda<br/><em>te dure años.</em></h1>
+  <p class="reveal reveal-delay-2">Cada tejido a mano merece un cuidado especial. Acá te dejo lo esencial — si tenés dudas, escribime.</p>
+</section>
+
+<div class="care-grid">
+  <div class="care-card reveal">
+    <div class="ico"><svg viewBox="0 0 24 24"><path d="M3 12c0 5 4 8 9 8s9-3 9-8c0-3-9-10-9-10S3 9 3 12z"/></svg></div>
+    <h3>Lavado</h3>
+    <p>A mano, siempre. Las prendas tejidas pierden forma con la centrifugación.</p>
+    <ul>
+      <li>Agua tibia (máx. 30°C) o fría</li>
+      <li>Jabón neutro o específico para lana</li>
+      <li>Sin frotar — sumergir y mover suave</li>
+      <li>Enjuagar con la misma temperatura</li>
+    </ul>
+  </div>
+  <div class="care-card reveal reveal-delay-1">
+    <div class="ico"><svg viewBox="0 0 24 24"><path d="M3 16h18M5 16l2 4h10l2-4M5 16V8a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v8"/></svg></div>
+    <h3>Secado</h3>
+    <p>El secado es el paso más delicado. Acá se gana o se pierde la forma de la prenda.</p>
+    <ul>
+      <li>Escurrir suavemente sin retorcer</li>
+      <li>Envolver en toalla limpia y presionar</li>
+      <li>Secar en plano sobre toalla seca</li>
+      <li>Lejos del sol directo y la estufa</li>
+    </ul>
+  </div>
+  <div class="care-card reveal">
+    <div class="ico"><svg viewBox="0 0 24 24"><path d="M12 4v16M4 12h16"/></svg></div>
+    <h3>Guardado</h3>
+    <p>Cómo guardarla para que esté lista la próxima temporada.</p>
+    <ul>
+      <li>Doblada, nunca colgada (deforma los hombros)</li>
+      <li>En lugar seco, lejos de la luz</li>
+      <li>Con bolsitas de lavanda o cedro</li>
+      <li>En cajas o bolsas de tela respirable</li>
+    </ul>
+  </div>
+  <div class="care-card dont-card reveal reveal-delay-1">
+    <div class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M5 5l14 14"/></svg></div>
+    <h3>Evitá siempre</h3>
+    <p>Estas son las cosas que arruinan un tejido a mano.</p>
+    <ul>
+      <li>Lavarropas y secarropas</li>
+      <li>Lavandina, blanqueadores</li>
+      <li>Plancha directa sobre el tejido</li>
+      <li>Perchas que cuelguen y deformen</li>
+    </ul>
+  </div>
+</div>
+
+<section class="tips">
+  <div class="container">
+    <div class="eyebrow reveal" style="color: var(--terracota-200); margin-bottom: 16px;">— Tips extra de Lili</div>
+    <h2 class="serif reveal reveal-delay-1">Mantenelo con cariño.</h2>
+    <ol class="tips-list">
+      <li class="reveal"><div><h4>Cepillá las pelusitas</h4><p>Con un cepillo suave para lana o una piedra pómez especial, en sentido del tejido. Devuelve el aspecto nuevo.</p></div></li>
+      <li class="reveal"><div><h4>Vapor en vez de plancha</h4><p>Si necesitás aplanar, usá vapor a 10cm de distancia. Nunca apoyes la plancha caliente.</p></div></li>
+      <li class="reveal"><div><h4>Si se enganchó un hilo</h4><p>No lo cortes. Pasalo del lado de adentro con una aguja de crochet y rematá con un nudito chiquito.</p></div></li>
+      <li class="reveal"><div><h4>Manchas localizadas</h4><p>Tratá inmediatamente con agua fría desde adentro hacia afuera. Sin restregar.</p></div></li>
+    </ol>
+  </div>
+</section>
+
+<div data-include="footer"></div>
+
+<script src="assets/data.js"></script>
+<script src="assets/shared.js"></script>
+<script src="assets/layout.js"></script>
+<script>window.BDLLayout.mount('cuidados');</script>
+</body>
+</html>

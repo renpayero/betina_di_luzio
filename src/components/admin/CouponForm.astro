@@ -1,0 +1,108 @@
+---
+import type { Category, Coupon } from '../../db/schema.ts';
+
+interface Props {
+  action: string;
+  coupon?: Coupon | null;
+  cats: Category[];
+  submitLabel: string;
+}
+const { action, coupon, cats, submitLabel } = Astro.props;
+const c = coupon;
+
+const fmtDateInput = (d: Date | null | undefined): string => {
+  if (!d) return '';
+  const iso = d.toISOString().split('T');
+  return iso[0] ?? '';
+};
+---
+
+<form method="post" action={action} class="form-card">
+  <div class="field-row">
+    <div class="field">
+      <label for="code">Código</label>
+      <input
+        type="text"
+        id="code"
+        name="code"
+        value={c?.code ?? ''}
+        required
+        maxlength="32"
+        style="font-family: var(--mono); text-transform: uppercase;"
+        placeholder="OTONO20"
+      />
+      <span class="help">Sólo letras, números y guiones. Se convierte a mayúsculas.</span>
+    </div>
+    <div class="field">
+      <label for="kind">Tipo</label>
+      <select id="kind" name="kind">
+        <option value="percent" selected={c?.kind === 'percent'}>Porcentaje</option>
+        <option value="fixed" selected={c?.kind === 'fixed'}>Monto fijo</option>
+        <option value="free_shipping" selected={c?.kind === 'free_shipping'}>Envío gratis</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="field-row">
+    <div class="field">
+      <label for="value">Valor</label>
+      <input type="number" id="value" name="value" value={c?.value ?? 0} min="0" max="1000000" />
+      <span class="help">% si tipo=Porcentaje, monto ARS si tipo=Monto fijo, 0 para Envío gratis.</span>
+    </div>
+    <div class="field">
+      <label for="minPurchase">Compra mínima (ARS)</label>
+      <input type="number" id="minPurchase" name="minPurchase" value={c?.minPurchase ?? 0} min="0" max="100000000" />
+    </div>
+  </div>
+
+  <div class="field-row">
+    <div class="field">
+      <label for="expiresAt">Vencimiento</label>
+      <input type="date" id="expiresAt" name="expiresAt" value={fmtDateInput(c?.expiresAt)} />
+      <span class="help">Vacío = sin vencimiento.</span>
+    </div>
+    <div class="field">
+      <label for="maxUses">Máximo de usos</label>
+      <input type="number" id="maxUses" name="maxUses" value={c?.maxUses ?? ''} min="1" max="100000" placeholder="∞" />
+    </div>
+  </div>
+
+  <div class="field-row">
+    <div class="field">
+      <label for="scope">Aplicar a</label>
+      <select id="scope" name="scope">
+        <option value="all" selected={c?.scope === 'all' || !c}>Toda la tienda</option>
+        <option value="category" selected={c?.scope === 'category'}>Categoría específica</option>
+        <option value="products" selected={c?.scope === 'products'}>Productos seleccionados</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="categoryId">Categoría (si aplica)</label>
+      <select id="categoryId" name="categoryId">
+        <option value="" selected={!c?.categoryId}>—</option>
+        {
+          cats.map((cat) => (
+            <option value={cat.id} selected={c?.categoryId === cat.id}>
+              {cat.name}
+            </option>
+          ))
+        }
+      </select>
+    </div>
+  </div>
+
+  <div class="field">
+    <label for="isActive">Estado</label>
+    <select id="isActive" name="isActive">
+      <option value="true" selected={c?.isActive !== false}>Activo</option>
+      <option value="false" selected={c?.isActive === false}>Pausado</option>
+    </select>
+  </div>
+
+  <div class="form-actions">
+    <a href="/admin/cupones" class="btn-secondary">← Cancelar</a>
+    <div class="right">
+      <button type="submit" class="btn-add">{submitLabel}</button>
+    </div>
+  </div>
+</form>

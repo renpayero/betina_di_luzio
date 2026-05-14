@@ -1,0 +1,157 @@
+---
+import { COLOR_NAMES } from '../../lib/colors.ts';
+
+interface Props {
+  name: string;
+  initial?: string;
+  label?: string;
+  help?: string;
+}
+const {
+  name,
+  initial = '',
+  label = 'Color',
+  help,
+} = Astro.props;
+
+const cleaned = (initial || '').trim().toUpperCase();
+const initialHex = /^#[0-9A-F]{6}$/.test(cleaned) ? cleaned : '#CB674C';
+
+const palette: ReadonlyArray<{ hex: string; name: string }> = Object.entries(
+  COLOR_NAMES
+).map(([hex, n]) => ({ hex, name: n }));
+const isCustom = !palette.some((c) => c.hex === initialHex);
+---
+
+<div class="color-single" data-color-single>
+  <span class="color-single__label">{label}</span>
+  <input type="hidden" name={name} value={initialHex} data-hidden />
+  <div class="color-single__row">
+    <div class="color-single__preview" data-preview style={`background:${initialHex}`} title={initialHex} />
+    <select data-select>
+      {
+        palette.map(({ hex, name: cname }) => (
+          <option value={hex} selected={hex === initialHex}>
+            {cname}
+          </option>
+        ))
+      }
+      <option value="__custom" selected={isCustom}>Otro color…</option>
+    </select>
+    <input
+      type="color"
+      data-custom
+      value={initialHex}
+      hidden={!isCustom}
+      aria-label="Elegí un color personalizado"
+    />
+  </div>
+  {help && <p class="color-single__help">{help}</p>}
+</div>
+
+<style>
+  .color-single {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .color-single__label {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--ink-soft);
+  }
+  .color-single__row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .color-single__preview {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    border: 1px solid rgba(54, 22, 14, 0.12);
+    flex-shrink: 0;
+  }
+  .color-single select {
+    flex: 1;
+    padding: 10px 14px;
+    font: inherit;
+    font-size: 14px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: white;
+    min-width: 160px;
+  }
+  .color-single input[type='color'] {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 1px solid rgba(54, 22, 14, 0.18);
+    border-radius: 8px;
+    cursor: pointer;
+    background: transparent;
+    overflow: hidden;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  .color-single input[type='color']::-webkit-color-swatch-wrapper {
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+  }
+  .color-single input[type='color']::-webkit-color-swatch {
+    border: 0;
+    border-radius: 8px;
+  }
+  .color-single input[type='color']::-moz-color-swatch {
+    border: 0;
+    border-radius: 8px;
+  }
+  .color-single__help {
+    margin: 0;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-soft);
+  }
+</style>
+
+<script>
+  const wire = (root: HTMLElement): void => {
+    if (root.dataset.wired === 'true') return;
+    root.dataset.wired = 'true';
+    const hidden = root.querySelector<HTMLInputElement>('[data-hidden]');
+    const select = root.querySelector<HTMLSelectElement>('[data-select]');
+    const custom = root.querySelector<HTMLInputElement>('[data-custom]');
+    const preview = root.querySelector<HTMLElement>('[data-preview]');
+    if (!hidden || !select || !custom || !preview) return;
+
+    const apply = (hex: string): void => {
+      hidden.value = hex;
+      preview.style.background = hex;
+      preview.title = hex;
+    };
+
+    select.addEventListener('change', () => {
+      if (select.value === '__custom') {
+        custom.hidden = false;
+        custom.focus();
+        apply(custom.value);
+      } else {
+        custom.hidden = true;
+        apply(select.value);
+      }
+    });
+    custom.addEventListener('input', () => apply(custom.value));
+    custom.addEventListener('change', () => apply(custom.value));
+  };
+
+  const init = (): void => {
+    document.querySelectorAll<HTMLElement>('[data-color-single]').forEach(wire);
+  };
+
+  init();
+  document.addEventListener('astro:page-load', init);
+</script>

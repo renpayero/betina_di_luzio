@@ -1,6 +1,13 @@
 import { defineMiddleware } from 'astro:middleware';
 import { SESSION_COOKIE, getSession } from './lib/auth.ts';
 
+const setSecurityHeaders = (res: Response): void => {
+  res.headers.set('X-Content-Type-Options', 'nosniff');
+  res.headers.set('X-Frame-Options', 'DENY');
+  res.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+};
+
 export const onRequest = defineMiddleware(async (context, next) => {
   const cookie = context.cookies.get(SESSION_COOKIE);
   const sessionId = cookie?.value;
@@ -11,7 +18,6 @@ export const onRequest = defineMiddleware(async (context, next) => {
       context.locals.user = result.user;
       context.locals.session = result.session;
     } else {
-      // expired/invalid → clean cookie
       context.cookies.delete(SESSION_COOKIE, { path: '/' });
     }
   }
@@ -22,12 +28,18 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   if (isAdminRoute && !isAdmin) {
     const target = encodeURIComponent(pathname + context.url.search);
-    return context.redirect(`/login?next=${target}`, 302);
+    const res = context.redirect(`/login?next=${target}`, 302);
+    setSecurityHeaders(res);
+    return res;
   }
 
   if (pathname === '/login' && isAdmin) {
-    return context.redirect('/admin', 302);
+    const res = context.redirect('/admin', 302);
+    setSecurityHeaders(res);
+    return res;
   }
 
-  return next();
+  const res = await next();
+  setSecurityHeaders(res);
+  return res;
 });

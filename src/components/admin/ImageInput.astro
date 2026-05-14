@@ -1,0 +1,320 @@
+---
+interface Props {
+  name: string;
+  initialUrl?: string | null;
+  section?: 'home' | 'about' | 'category' | 'product' | 'generic';
+  label?: string;
+  aspectRatio?: string;
+  help?: string;
+}
+const {
+  name,
+  initialUrl = '',
+  section = 'generic',
+  label = 'Imagen',
+  aspectRatio = '4 / 5',
+  help,
+} = Astro.props;
+const value = initialUrl ?? '';
+---
+
+<div
+  class="image-input"
+  data-section={section}
+  data-name={name}
+  style={`--ratio: ${aspectRatio};`}
+>
+  <label class="image-input__label">{label}</label>
+  <input type="hidden" name={name} value={value} data-hidden />
+  <div class="image-input__frame">
+    <div class="image-input__preview" data-preview>
+      {value
+        ? <img src={value} alt="" loading="lazy" decoding="async" />
+        : <div class="image-input__empty">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <circle cx="8.5" cy="8.5" r="1.5"/>
+              <path d="M21 15l-5-5L5 21"/>
+            </svg>
+            <span>Sin imagen</span>
+          </div>
+      }
+    </div>
+    <div class="image-input__overlay" data-overlay hidden>
+      <span class="image-input__spinner" aria-hidden="true"></span>
+      <span class="image-input__progress" data-progress>Subiendo…</span>
+    </div>
+  </div>
+
+  <div class="image-input__controls">
+    <label class="image-input__file">
+      <input
+        type="file"
+        accept="image/jpeg,image/png,image/webp,image/avif"
+        data-file
+      />
+      <span class="image-input__file-btn">Elegir imagen</span>
+    </label>
+    <button type="button" class="image-input__remove" data-remove hidden>
+      Quitar
+    </button>
+  </div>
+
+  <p class="image-input__msg" data-msg hidden role="status" aria-live="polite"></p>
+  {help && <p class="image-input__help">{help}</p>}
+</div>
+
+<style>
+  .image-input {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .image-input__label {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--ink-soft);
+  }
+  .image-input__frame {
+    position: relative;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--bg-warm);
+    overflow: hidden;
+    aspect-ratio: var(--ratio, 4 / 5);
+    max-width: 280px;
+  }
+  .image-input__preview,
+  .image-input__preview img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .image-input__empty {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: var(--ink-soft);
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+  }
+  .image-input__empty svg {
+    width: 28px;
+    height: 28px;
+  }
+  .image-input__overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(252, 245, 244, 0.88);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--accent-deep);
+  }
+  .image-input__spinner {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid var(--terracota-200);
+    border-top-color: var(--accent-deep);
+    animation: image-input-spin 0.8s linear infinite;
+  }
+  @keyframes image-input-spin {
+    to { transform: rotate(360deg); }
+  }
+  .image-input__controls {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    max-width: 280px;
+  }
+  .image-input__file input[type='file'] {
+    display: none;
+  }
+  .image-input__file-btn,
+  .image-input__remove {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 4px;
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    background: white;
+    border: 1px solid var(--line);
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .image-input__file-btn:hover {
+    border-color: var(--accent-deep);
+    color: var(--accent-deep);
+  }
+  .image-input__remove {
+    color: var(--accent-deep);
+  }
+  .image-input__remove:hover {
+    background: var(--accent-deep);
+    color: white;
+  }
+  .image-input__msg {
+    margin: 0;
+    font-family: var(--mono);
+    font-size: 11px;
+  }
+  .image-input__msg[data-tone='err'] {
+    color: var(--accent-deep);
+  }
+  .image-input__msg[data-tone='ok'] {
+    color: #2f8f5c;
+  }
+  .image-input__help {
+    margin: 0;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-soft);
+    max-width: 280px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .image-input__spinner { animation: none; }
+  }
+</style>
+
+<script>
+  const SECTION_DEFAULT = 'generic';
+
+  type Refs = {
+    root: HTMLElement;
+    hidden: HTMLInputElement;
+    file: HTMLInputElement;
+    preview: HTMLElement;
+    overlay: HTMLElement;
+    progress: HTMLElement;
+    remove: HTMLButtonElement;
+    msg: HTMLElement;
+  };
+
+  const refsOf = (root: HTMLElement): Refs | null => {
+    const hidden = root.querySelector<HTMLInputElement>('[data-hidden]');
+    const file = root.querySelector<HTMLInputElement>('[data-file]');
+    const preview = root.querySelector<HTMLElement>('[data-preview]');
+    const overlay = root.querySelector<HTMLElement>('[data-overlay]');
+    const progress = root.querySelector<HTMLElement>('[data-progress]');
+    const remove = root.querySelector<HTMLButtonElement>('[data-remove]');
+    const msg = root.querySelector<HTMLElement>('[data-msg]');
+    if (!hidden || !file || !preview || !overlay || !progress || !remove || !msg)
+      return null;
+    return { root, hidden, file, preview, overlay, progress, remove, msg };
+  };
+
+  const renderPreview = (r: Refs, url: string): void => {
+    if (url) {
+      r.preview.innerHTML = `<img src="${url}" alt="" loading="lazy" decoding="async">`;
+      r.remove.hidden = false;
+    } else {
+      r.preview.innerHTML = `
+        <div class="image-input__empty">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+            <circle cx="8.5" cy="8.5" r="1.5"/>
+            <path d="M21 15l-5-5L5 21"/>
+          </svg>
+          <span>Sin imagen</span>
+        </div>`;
+      r.remove.hidden = true;
+    }
+  };
+
+  const setMsg = (r: Refs, text: string, tone: 'ok' | 'err' | null): void => {
+    if (!text || !tone) {
+      r.msg.hidden = true;
+      r.msg.textContent = '';
+      r.msg.removeAttribute('data-tone');
+      return;
+    }
+    r.msg.hidden = false;
+    r.msg.textContent = text;
+    r.msg.setAttribute('data-tone', tone);
+  };
+
+  const upload = async (r: Refs, fileObj: File, section: string): Promise<void> => {
+    setMsg(r, '', null);
+    r.overlay.hidden = false;
+    r.progress.textContent = 'Subiendo…';
+    try {
+      const fd = new FormData();
+      fd.set('file', fileObj);
+      fd.set('section', section);
+      const res = await fetch('/api/admin/upload', {
+        method: 'POST',
+        body: fd,
+        credentials: 'same-origin',
+      });
+      let body: { ok?: boolean; url?: string; error?: string } = {};
+      try {
+        body = (await res.json()) as typeof body;
+      } catch {
+        body = { ok: false, error: `HTTP ${res.status}` };
+      }
+      if (!res.ok || !body.ok || !body.url) {
+        throw new Error(body.error ?? `Error ${res.status}`);
+      }
+      r.hidden.value = body.url;
+      renderPreview(r, body.url);
+      setMsg(r, 'Imagen subida.', 'ok');
+    } catch (err) {
+      setMsg(
+        r,
+        err instanceof Error ? err.message : 'No se pudo subir.',
+        'err'
+      );
+    } finally {
+      r.overlay.hidden = true;
+      r.file.value = '';
+    }
+  };
+
+  const wire = (root: HTMLElement): void => {
+    if (root.dataset.wired === 'true') return;
+    root.dataset.wired = 'true';
+    const r = refsOf(root);
+    if (!r) return;
+    const section = root.dataset.section ?? SECTION_DEFAULT;
+    if (r.hidden.value) r.remove.hidden = false;
+    r.file.addEventListener('change', () => {
+      const f = r.file.files?.[0];
+      if (f) upload(r, f, section);
+    });
+    r.remove.addEventListener('click', () => {
+      r.hidden.value = '';
+      renderPreview(r, '');
+      setMsg(r, '', null);
+    });
+  };
+
+  const init = (): void => {
+    document.querySelectorAll<HTMLElement>('.image-input').forEach(wire);
+  };
+
+  init();
+  document.addEventListener('astro:page-load', init);
+</script>

@@ -1,21 +1,8 @@
 import type { APIRoute } from 'astro';
+import { isSameOrigin } from '../../lib/csrf.ts';
+import { createRateLimit } from '../../lib/rate-limit.ts';
 
-const RATE_WINDOW_MS = 60_000;
-const RATE_MAX_HITS = 5;
-const buckets = new Map<string, number[]>();
-
-const allowed = (ip: string): boolean => {
-  const now = Date.now();
-  const cutoff = now - RATE_WINDOW_MS;
-  const recent = (buckets.get(ip) ?? []).filter((t) => t > cutoff);
-  if (recent.length >= RATE_MAX_HITS) {
-    buckets.set(ip, recent);
-    return false;
-  }
-  recent.push(now);
-  buckets.set(ip, recent);
-  return true;
-};
+const limiter = createRateLimit('contact', 5);
 
 const json = (data: unknown, init?: ResponseInit): Response =>
   new Response(JSON.stringify(data), {
@@ -38,9 +25,13 @@ const trim = (raw: FormDataEntryValue | null): string =>
   typeof raw === 'string' ? raw.trim() : '';
 
 export const POST: APIRoute = async ({ request, clientAddress }) => {
+  if (!isSameOrigin(request)) {
+    return json({ error: 'Forbidden' }, { status: 403 });
+  }
+
   const ip = clientAddress ?? 'unknown';
 
-  if (!allowed(ip)) {
+  if (!limiter.allow(ip)) {
     return json(
       { error: 'Demasiados envíos. Probá de nuevo en un minuto.' },
       { status: 429, headers: { 'Retry-After': '60' } }

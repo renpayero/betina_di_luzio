@@ -1,0 +1,486 @@
+---
+import { getCustomColors } from '../../lib/queries.ts';
+
+interface Props {
+  name: string;
+  initial?: string;
+  label?: string;
+  help?: string;
+}
+const {
+  name,
+  initial = '',
+  label = 'Colores',
+  help = 'Tocá para elegir. Usá la × para quitar un color del catálogo. Si te falta uno, agregalo abajo.',
+} = Astro.props;
+
+const initialList = (initial || '')
+  .split(/[,\s]+/g)
+  .map((c) => c.trim().toUpperCase())
+  .filter((c) => /^#[0-9A-F]{6}$/.test(c));
+const initialSet = new Set(initialList);
+
+const dbColors = await getCustomColors();
+const palette: Array<{ hex: string; name: string }> = dbColors.map((c) => ({
+  hex: c.hex,
+  name: c.name,
+}));
+const paletteHexSet = new Set(palette.map((c) => c.hex));
+
+// Hex usados por este producto que ya no están en el catálogo (fueron eliminados).
+const orphanHex = initialList.filter((h) => !paletteHexSet.has(h));
+---
+
+<div class="color-palette" data-color-picker>
+  <span class="color-palette__label">{label}</span>
+  <input type="hidden" name={name} value={[...initialSet].join(',')} data-hidden />
+  <div class="color-palette__grid" role="group" aria-label={label} data-grid>
+    {
+      palette.map(({ hex, name: cname }) => (
+        <button
+          type="button"
+          class:list={['color-chip', { 'is-on': initialSet.has(hex) }]}
+          data-hex={hex}
+          aria-pressed={initialSet.has(hex) ? 'true' : 'false'}
+          title={`${cname} · ${hex}`}
+        >
+          <span class="color-chip__swatch" style={`background:${hex}`} />
+          <span class="color-chip__name">{cname}</span>
+          <span class="color-chip__remove" data-remove aria-label={`Quitar ${cname} del catálogo`}>×</span>
+        </button>
+      ))
+    }
+    {
+      orphanHex.map((hex) => (
+        <button
+          type="button"
+          class="color-chip is-on color-chip--orphan"
+          data-hex={hex}
+          data-orphan="true"
+          aria-pressed="true"
+          title={`${hex} (eliminado del catálogo)`}
+        >
+          <span class="color-chip__swatch" style={`background:${hex}`} />
+          <span class="color-chip__name">{hex}</span>
+          <span class="color-chip__remove" data-remove-local aria-label="Quitar de este producto">×</span>
+        </button>
+      ))
+    }
+  </div>
+
+  <div class="color-palette__custom" data-custom-editor>
+    <button type="button" class="color-palette__custom-toggle" data-toggle aria-expanded="false">
+      <span class="color-palette__plus" aria-hidden="true">+</span>
+      <span>Agregar un color al catálogo</span>
+    </button>
+    <div class="color-palette__custom-form" data-form hidden>
+      <input
+        type="color"
+        data-custom-hex
+        value="#CB674C"
+        aria-label="Elegí el color"
+      />
+      <input
+        type="text"
+        data-custom-name
+        placeholder="Nombre (ej: Mostaza)"
+        maxlength="40"
+        aria-label="Nombre del color"
+      />
+      <button type="button" class="btn-add" data-add>Agregar</button>
+      <button type="button" class="color-palette__custom-cancel" data-cancel aria-label="Cancelar">×</button>
+    </div>
+  </div>
+
+  {help && <p class="color-palette__help">{help}</p>}
+</div>
+
+<style>
+  .color-palette {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .color-palette__label {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--ink-soft);
+  }
+  .color-palette__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 8px;
+  }
+  .color-chip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: white;
+    cursor: pointer;
+    font-family: inherit;
+    transition: border-color 0.15s, background 0.15s;
+    position: relative;
+    text-align: left;
+  }
+  .color-chip:hover {
+    border-color: var(--accent-deep);
+  }
+  .color-chip.is-on {
+    border-color: var(--accent-deep);
+    background: rgba(203, 103, 76, 0.06);
+  }
+  .color-chip--orphan {
+    border-style: dashed;
+    background: rgba(0, 0, 0, 0.02);
+  }
+  .color-chip__swatch {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1px solid rgba(54, 22, 14, 0.12);
+    flex-shrink: 0;
+  }
+  .color-chip__name {
+    font-size: 13px;
+    color: var(--ink);
+    line-height: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .color-chip__remove {
+    margin-left: auto;
+    width: 18px;
+    height: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    line-height: 1;
+    color: var(--ink-soft);
+    opacity: 0;
+    flex-shrink: 0;
+    border-radius: 50%;
+    transition: color 0.15s, background 0.15s, opacity 0.15s;
+    cursor: pointer;
+  }
+  .color-chip:hover .color-chip__remove,
+  .color-chip:focus-within .color-chip__remove {
+    opacity: 0.7;
+  }
+  .color-chip__remove:hover {
+    color: white;
+    background: var(--accent-deep);
+    opacity: 1;
+  }
+  .color-chip--orphan .color-chip__remove,
+  .color-chip [data-remove-local] {
+    opacity: 0.7;
+  }
+  .color-chip:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .color-palette__custom {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+  .color-palette__custom-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border: 1px dashed var(--line);
+    border-radius: 999px;
+    background: transparent;
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--ink-soft);
+    cursor: pointer;
+  }
+  .color-palette__custom-toggle:hover {
+    border-color: var(--accent-deep);
+    color: var(--accent-deep);
+  }
+  .color-palette__plus {
+    font-size: 16px;
+    line-height: 1;
+  }
+  .color-palette__custom-form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 8px 12px;
+    border: 1px solid var(--accent-deep);
+    border-radius: 999px;
+    background: rgba(203, 103, 76, 0.04);
+  }
+  .color-palette__custom-form input[type='color'] {
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    border: 1px solid rgba(54, 22, 14, 0.18);
+    border-radius: 50%;
+    overflow: hidden;
+    cursor: pointer;
+    background: transparent;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  .color-palette__custom-form input[type='color']::-webkit-color-swatch-wrapper {
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+  }
+  .color-palette__custom-form input[type='color']::-webkit-color-swatch {
+    border: 0;
+    border-radius: 50%;
+  }
+  .color-palette__custom-form input[type='color']::-moz-color-swatch {
+    border: 0;
+    border-radius: 50%;
+  }
+  .color-palette__custom-form input[type='text'] {
+    padding: 8px 12px;
+    font: inherit;
+    font-size: 13px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    min-width: 180px;
+  }
+  .color-palette__custom-cancel {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 0;
+    background: transparent;
+    color: var(--ink-soft);
+    font-size: 18px;
+    cursor: pointer;
+    line-height: 1;
+  }
+  .color-palette__custom-cancel:hover {
+    color: var(--accent-deep);
+  }
+  .color-palette__help {
+    margin: 0;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-soft);
+  }
+</style>
+
+<script>
+  import { confirmDialog, toast } from '../../scripts/admin-confirm.ts';
+
+  const sync = (root: HTMLElement): void => {
+    const hidden = root.querySelector<HTMLInputElement>('[data-hidden]');
+    if (!hidden) return;
+    const selected = Array.from(
+      root.querySelectorAll<HTMLButtonElement>('.color-chip.is-on')
+    ).map((b) => b.dataset.hex ?? '');
+    hidden.value = selected.filter(Boolean).join(',');
+  };
+
+  const removeFromCatalog = async (root: HTMLElement, chip: HTMLButtonElement): Promise<void> => {
+    const hex = chip.dataset.hex;
+    if (!hex) return;
+    const name = chip.querySelector('.color-chip__name')?.textContent ?? hex;
+    const ok = await confirmDialog({
+      title: `¿Sacar “${name}” del catálogo?`,
+      message: 'Los productos que ya lo tienen seleccionado siguen iguales. Sólo deja de aparecer en la paleta para futuros productos.',
+      confirmText: 'Sacar del catálogo',
+      cancelText: 'Cancelar',
+      danger: true,
+    });
+    if (!ok) return;
+    try {
+      const fd = new FormData();
+      fd.set('hex', hex);
+      const res = await fetch('/api/admin/colores/eliminar', {
+        method: 'POST',
+        body: fd,
+        credentials: 'same-origin',
+      });
+      const body = (await res.json()) as { ok?: boolean; error?: string };
+      if (!res.ok || !body.ok) {
+        toast({ message: body.error ?? 'No se pudo eliminar el color.', tone: 'err' });
+        return;
+      }
+      chip.remove();
+      sync(root);
+      toast({ message: `“${name}” quedó fuera del catálogo.`, tone: 'ok' });
+    } catch (e) {
+      toast({ message: 'Sin conexión. Probá de nuevo.', tone: 'err' });
+    }
+  };
+
+  const wireChip = (root: HTMLElement, chip: HTMLButtonElement): void => {
+    if (chip.dataset.chipWired === 'true') return;
+    chip.dataset.chipWired = 'true';
+    chip.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      if (target.closest('[data-remove-local]')) {
+        // Solo lo saca de este producto (orphan)
+        e.preventDefault();
+        chip.remove();
+        sync(root);
+        return;
+      }
+      if (target.closest('[data-remove]')) {
+        e.preventDefault();
+        removeFromCatalog(root, chip);
+        return;
+      }
+      const isOn = chip.classList.toggle('is-on');
+      chip.setAttribute('aria-pressed', isOn ? 'true' : 'false');
+      sync(root);
+    });
+  };
+
+  const addToGrid = (root: HTMLElement, hex: string, displayName: string): HTMLButtonElement | null => {
+    const grid = root.querySelector<HTMLElement>('[data-grid]');
+    if (!grid) return null;
+    const upper = hex.toUpperCase();
+    const existing = grid.querySelector<HTMLButtonElement>(
+      `.color-chip[data-hex="${upper}"]`
+    );
+    if (existing) {
+      existing.classList.add('is-on');
+      existing.setAttribute('aria-pressed', 'true');
+      sync(root);
+      return existing;
+    }
+    // Clonar un chip existente para heredar los atributos scoped de Astro
+    // (data-astro-cid-*) que aplican los estilos. createElement crearía un chip
+    // sin estilos.
+    const template = grid.querySelector<HTMLButtonElement>(
+      '.color-chip:not(.color-chip--orphan)'
+    );
+    if (!template) {
+      console.warn('[color-picker] no hay template para clonar');
+      return null;
+    }
+    const chip = template.cloneNode(true) as HTMLButtonElement;
+    chip.classList.add('is-on');
+    chip.classList.remove('color-chip--orphan');
+    chip.dataset.hex = upper;
+    delete chip.dataset.chipWired;
+    delete chip.dataset.orphan;
+    chip.setAttribute('aria-pressed', 'true');
+    chip.title = `${displayName} · ${upper}`;
+    const swatch = chip.querySelector<HTMLElement>('.color-chip__swatch');
+    if (swatch) swatch.setAttribute('style', `background:${upper}`);
+    const nameEl = chip.querySelector<HTMLElement>('.color-chip__name');
+    if (nameEl) nameEl.textContent = displayName;
+    const removeEl = chip.querySelector<HTMLElement>('[data-remove], [data-remove-local]');
+    if (removeEl) {
+      removeEl.setAttribute('data-remove', '');
+      removeEl.removeAttribute('data-remove-local');
+      removeEl.setAttribute('aria-label', `Quitar ${displayName} del catálogo`);
+    }
+    grid.appendChild(chip);
+    wireChip(root, chip);
+    sync(root);
+    return chip;
+  };
+
+  const addToCatalog = async (root: HTMLElement, hex: string, name: string): Promise<boolean> => {
+    try {
+      const fd = new FormData();
+      fd.set('hex', hex.toUpperCase());
+      fd.set('name', name);
+      const res = await fetch('/api/admin/colores/agregar', {
+        method: 'POST',
+        body: fd,
+        credentials: 'same-origin',
+      });
+      const body = (await res.json()) as { ok?: boolean; error?: string };
+      if (!res.ok || !body.ok) {
+        toast({ message: body.error ?? 'No se pudo agregar el color.', tone: 'err' });
+        return false;
+      }
+      addToGrid(root, hex.toUpperCase(), name);
+      toast({ message: `“${name}” agregado al catálogo.`, tone: 'ok' });
+      return true;
+    } catch {
+      toast({ message: 'Sin conexión. Probá de nuevo.', tone: 'err' });
+      return false;
+    }
+  };
+
+  const wireCustomEditor = (root: HTMLElement): void => {
+    const editor = root.querySelector<HTMLElement>('[data-custom-editor]');
+    if (!editor) return;
+    const toggle = editor.querySelector<HTMLButtonElement>('[data-toggle]');
+    const form = editor.querySelector<HTMLElement>('[data-form]');
+    const hexInput = editor.querySelector<HTMLInputElement>('[data-custom-hex]');
+    const nameInput = editor.querySelector<HTMLInputElement>('[data-custom-name]');
+    const addBtn = editor.querySelector<HTMLButtonElement>('[data-add]');
+    const cancelBtn = editor.querySelector<HTMLButtonElement>('[data-cancel]');
+    if (!toggle || !form || !hexInput || !nameInput || !addBtn || !cancelBtn) return;
+
+    const close = () => {
+      form.hidden = true;
+      toggle.hidden = false;
+      toggle.setAttribute('aria-expanded', 'false');
+      nameInput.value = '';
+    };
+
+    toggle.addEventListener('click', () => {
+      form.hidden = false;
+      toggle.hidden = true;
+      toggle.setAttribute('aria-expanded', 'true');
+      hexInput.focus();
+    });
+    cancelBtn.addEventListener('click', close);
+
+    const submit = async () => {
+      const hex = hexInput.value.toUpperCase();
+      if (!/^#[0-9A-F]{6}$/.test(hex)) return;
+      const name = nameInput.value.trim();
+      if (name.length < 1) {
+        toast({ message: 'Ponele un nombre al color (ej: Mostaza).', tone: 'err' });
+        nameInput.focus();
+        return;
+      }
+      addBtn.disabled = true;
+      const ok = await addToCatalog(root, hex, name);
+      addBtn.disabled = false;
+      if (ok) close();
+    };
+    addBtn.addEventListener('click', submit);
+    nameInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        submit();
+      }
+    });
+  };
+
+  const wire = (root: HTMLElement): void => {
+    if (root.dataset.wired === 'true') return;
+    root.dataset.wired = 'true';
+    root.querySelectorAll<HTMLButtonElement>('.color-chip').forEach((c) => wireChip(root, c));
+    wireCustomEditor(root);
+  };
+
+  const init = (): void => {
+    document.querySelectorAll<HTMLElement>('[data-color-picker]').forEach(wire);
+  };
+
+  init();
+  document.addEventListener('astro:page-load', init);
+</script>

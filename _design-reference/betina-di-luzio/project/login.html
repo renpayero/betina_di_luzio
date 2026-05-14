@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ingresar · Betina Di Luzio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+<style>
+body { background: var(--bg); }
+.login-page { display: grid; grid-template-columns: 1fr 1fr; min-height: 100vh; }
+.login-side {
+  background: var(--bg-deep); color: var(--bg);
+  padding: 60px 56px;
+  display: flex; flex-direction: column; justify-content: space-between;
+  position: relative; overflow: hidden;
+}
+.login-side::before {
+  content: ""; position: absolute; inset: -60px;
+  background-image: repeating-linear-gradient(45deg, transparent 0 20px, rgba(252,245,244,0.04) 20px 21px);
+}
+.login-side .logo { font-family: var(--serif); font-size: 32px; position: relative;}
+.login-side .ampersand { color: var(--terracota-200); font-style: italic;}
+.login-side h2 { font-size: clamp(40px, 5vw, 64px); font-weight: 400; line-height: 1.05; max-width: 480px; position: relative;}
+.login-side h2 em { font-style: italic; color: var(--terracota-200);}
+.login-side .quote { font-family: var(--serif); font-style: italic; font-size: 19px; opacity: 0.7; max-width: 380px; position: relative;}
+
+.login-form-wrap { display: flex; align-items: center; justify-content: center; padding: 60px;}
+.login-form { width: 100%; max-width: 380px;}
+.login-form .eyebrow { color: var(--accent-deep); margin-bottom: 12px;}
+.login-form h1 { font-family: var(--serif); font-size: 44px; margin-bottom: 12px;}
+.login-form .lede { color: var(--ink-soft); margin-bottom: 36px;}
+.login-form .field { margin-bottom: 16px;}
+.login-form .form-row { display: flex; justify-content: space-between; align-items: center; margin: 8px 0 24px; font-size: 13px;}
+.login-form .form-row a { color: var(--accent-deep);}
+.login-form .form-row a:hover { text-decoration: underline;}
+.login-form button[type="submit"] { width: 100%; padding: 16px; background: var(--ink); color: var(--bg); border-radius: 999px; font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.18em; margin-bottom: 20px; transition: background 0.3s;}
+.login-form button[type="submit"]:hover { background: var(--accent-deep);}
+.login-form .divider { display: flex; align-items: center; gap: 16px; margin: 24px 0; color: var(--ink-soft); font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em;}
+.login-form .divider::before, .login-form .divider::after { content: ""; flex: 1; height: 1px; background: var(--line);}
+.login-form .signup { text-align: center; color: var(--ink-soft); font-size: 14px; margin-top: 24px;}
+.login-form .signup a { color: var(--accent-deep); text-decoration: underline;}
+.demo-hint { background: var(--bg-warm); padding: 12px 14px; border-radius: 4px; font-family: var(--mono); font-size: 11px; color: var(--ink-soft); margin-bottom: 16px; line-height: 1.5;}
+.demo-hint strong { color: var(--accent-deep);}
+.back-link { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.18em; color: var(--ink-soft); margin-bottom: 32px; display: inline-block;}
+.back-link:hover { color: var(--accent);}
+@media (max-width: 800px) { .login-page { grid-template-columns: 1fr; } .login-side { padding: 32px;} .login-form-wrap { padding: 32px;} }
+</style>
+</head>
+<body>
+<main class="login-page">
+  <aside class="login-side">
+    <div class="logo">Betina<span class="ampersand"> · </span>Di Luzio</div>
+    <h2 class="serif">Cada punto guarda <em>una historia.</em></h2>
+    <p class="quote">"Tejer me lleva a las tardes con mi abuela. Quiero dejar una parte mía en cada prenda."<br/>— Lili</p>
+  </aside>
+
+  <div class="login-form-wrap">
+    <div class="login-form">
+      <a href="index.html" class="back-link">← Volver al sitio</a>
+      <div class="eyebrow">— Acceso</div>
+      <h1>Ingresá<br/>a tu cuenta</h1>
+      <p class="lede">Para gestionar tu tienda, ver pedidos y métricas.</p>
+
+      <div class="demo-hint"><strong>Demo:</strong> usá <strong>admin@betinadiluzio.com</strong> / <strong>tejido2026</strong> para entrar al panel.</div>
+
+      <form onsubmit="event.preventDefault(); window.location='admin.html';">
+        <div class="field">
+          <label>Email</label>
+          <input type="email" required placeholder="admin@betinadiluzio.com" value="admin@betinadiluzio.com" />
+        </div>
+        <div class="field">
+          <label>Contraseña</label>
+          <input type="password" required value="tejido2026" />
+        </div>
+        <div class="form-row">
+          <label style="display: flex; gap: 8px; align-items: center; color: var(--ink-soft); font-family: inherit; text-transform: none; letter-spacing: 0;"><input type="checkbox" /> Recordarme</label>
+          <a href="#">¿Olvidaste tu contraseña?</a>
+        </div>
+        <button type="submit">
+          Ingresar al panel
+        </button>
+      </form>
+      <div class="divider">o</div>
+      <p class="signup">¿Sos cliente y querés crear cuenta? <a href="#">Registrate</a></p>
+    </div>
+  </div>
+</main>
+<script src="assets/shared.js"></script>
+</body>
+</html>

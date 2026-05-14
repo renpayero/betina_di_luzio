@@ -1,0 +1,107 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import Tag from '../../../components/admin/Tag.astro';
+import IconAction from '../../../components/admin/IconAction.astro';
+import { getAdminCategoriesWithCounts } from '../../../lib/queries.ts';
+
+const q = Astro.url.searchParams.get('q')?.toLowerCase() ?? '';
+const all = await getAdminCategoriesWithCounts();
+const list = q
+  ? all.filter(
+      (c) =>
+        c.name.toLowerCase().includes(q) ||
+        c.slug.toLowerCase().includes(q) ||
+        c.blurb.toLowerCase().includes(q)
+    )
+  : all;
+---
+
+<AdminLayout title="Categorías" subtitle="Organizá la tienda como vos querés.">
+  <form class="toolbar" method="get" action="/admin/categorias">
+    <input
+      type="search"
+      name="q"
+      value={q}
+      placeholder="Buscar categoría…"
+      data-filter-rows
+      autocomplete="off"
+    />
+    <div class="right">
+      <button type="submit" class="btn-secondary" data-filter-hidden-on-auto>Filtrar</button>
+      <a href="/admin/categorias/nueva" class="btn-add">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14" /></svg>
+        Nueva categoría
+      </a>
+    </div>
+  </form>
+
+  <div class="panel" style="padding: 0;">
+    {
+      list.length === 0 ? (
+        <p style="padding:32px; color:var(--ink-soft); font-style:italic; text-align:center;">
+          Sin categorías. <a href="/admin/categorias/nueva" style="color:var(--accent-deep);">Crear la primera →</a>
+        </p>
+      ) : (
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Orden</th>
+              <th>Imagen</th>
+              <th>Categoría</th>
+              <th>Slug</th>
+              <th>Productos</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {list.map((c) => (
+              <tr>
+                <td>
+                  <span style="font-family:var(--mono); color:var(--ink-soft);">
+                    {String(c.sortOrder).padStart(2, '0')}
+                  </span>
+                </td>
+                <td>
+                  {c.imageUrl ? (
+                    <img src={c.imageUrl} alt="" loading="lazy" style="width:44px; height:55px; object-fit:cover; border-radius:4px; display:block;" />
+                  ) : (
+                    <div style="width:44px; height:55px; background:var(--bg-warm); border-radius:4px; display:flex; align-items:center; justify-content:center; color:var(--ink-soft); font-size:10px; font-family:var(--mono);">—</div>
+                  )}
+                </td>
+                <td>
+                  <strong style="font-family:var(--serif); font-size:18px;">{c.name}</strong>
+                  <br />
+                  <span style="color:var(--ink-soft); font-size:13px;">{c.blurb}</span>
+                </td>
+                <td>
+                  <span style="font-family:var(--mono); font-size:12px;">/{c.slug}</span>
+                </td>
+                <td>
+                  <Tag tone={c.productCount > 0 ? 'green' : 'gray'}>
+                    {c.productCount} prod.
+                  </Tag>
+                </td>
+                <td>
+                  <div class="actions-cell">
+                    <IconAction href={`/admin/categorias/${c.id}/editar`} title="Editar" icon="edit" />
+                    <form
+                      method="post"
+                      action={`/api/admin/categorias/${c.id}/eliminar`}
+                      style="display:inline;"
+                      data-confirm={`¿Eliminar la categoría “${c.name}”?`}
+                      data-confirm-message="Si tiene productos asignados se rechazará automáticamente."
+                      data-confirm-text="Eliminar"
+                      data-confirm-danger="true"
+                    >
+                      <IconAction type="submit" title="Eliminar" icon="delete" danger />
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )
+    }
+  </div>
+</AdminLayout>

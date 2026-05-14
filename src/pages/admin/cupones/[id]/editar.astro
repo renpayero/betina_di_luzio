@@ -1,0 +1,20 @@
+---
+import AdminLayout from '../../../../layouts/AdminLayout.astro';
+import CouponForm from '../../../../components/admin/CouponForm.astro';
+import { getCouponById, getCategories } from '../../../../lib/queries.ts';
+
+const { id } = Astro.params;
+if (!id) return Astro.redirect('/admin/cupones');
+const [coupon, cats] = await Promise.all([getCouponById(id), getCategories()]);
+if (!coupon)
+  return Astro.redirect('/admin/cupones?err=1&msg=Cupón%20no%20encontrado.');
+---
+
+<AdminLayout title={`Editar · ${coupon.code}`} subtitle="Modificar valor, alcance o estado.">
+  <CouponForm
+    action={`/api/admin/cupones/${coupon.id}/actualizar`}
+    coupon={coupon}
+    cats={cats}
+    submitLabel="Guardar cambios"
+  />
+</AdminLayout>

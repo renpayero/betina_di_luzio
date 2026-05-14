@@ -3,13 +3,14 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import ProductCard from '../components/ProductCard.astro';
 import PlaceholderImg from '../components/PlaceholderImg.astro';
 import Marquee from '../components/Marquee.astro';
-import { getCategories, getFeaturedProducts } from '../lib/queries.ts';
+import { getCategories, getFeaturedProductsWithHero } from '../lib/queries.ts';
+import { getContent, getContentImage, getContentBool } from '../lib/content.ts';
 import { waLink } from '../lib/constants.ts';
 
 const ctaWa = waLink('Hola Betina! Quería pedirte un tejido personalizado.');
 const [categories, featured] = await Promise.all([
   getCategories(),
-  getFeaturedProducts(4),
+  getFeaturedProductsWithHero(4),
 ]);
 
 const CAT_GRADIENTS: Record<string, string> = {
@@ -20,6 +21,62 @@ const CAT_GRADIENTS: Record<string, string> = {
   bebes: 'linear-gradient(135deg, #FCF5F4, var(--terracota-100))',
   home: 'linear-gradient(135deg, var(--terracota-500), var(--olivo-700))',
 };
+
+// Contenido editable desde /admin/contenido
+const [
+  heroTitle1,
+  heroTitle2,
+  heroSubtitle,
+  heroCtaPrimary,
+  heroCtaSecondary,
+  heroImg1,
+  heroImg2,
+  heroImg3,
+  marqueeEnabled,
+  storyEyebrow,
+  storyTitle,
+  storyBody,
+  storyImg,
+  step1Title,
+  step1Body,
+  step2Title,
+  step2Body,
+  step3Title,
+  step3Body,
+  ctaTitle,
+  ctaSubtitle,
+] = await Promise.all([
+  getContent('home.hero.title1', 'Cada punto'),
+  getContent('home.hero.title2', 'una historia'),
+  getContent('home.hero.subtitle', 'Prendas tejidas a mano, en crochet y dos agujas.'),
+  getContent('home.hero.cta_primary', 'Explorar la tienda'),
+  getContent('home.hero.cta_secondary', 'Conocé a Betina'),
+  getContentImage('home.hero.image1', null),
+  getContentImage('home.hero.image2', null),
+  getContentImage('home.hero.image3', null),
+  getContentBool('home.marquee.enabled', true),
+  getContent('home.story.eyebrow', '— Manos de Lili Di Luzio'),
+  getContent('home.story.title', 'El tejido es mi forma de meditar.'),
+  getContent('home.story.body',
+    '"Tejer me lleva a la cocina de mi mamá, a las tardes con mi abuela. Ahora dejo una parte mía en cada prenda — la pienso para vos."'
+  ),
+  getContentImage('home.story.image', null),
+  getContent('home.process.step1_title', 'Conversamos'),
+  getContent('home.process.step1_body', 'Me contás qué buscás, para quién, en qué color y talle.'),
+  getContent('home.process.step2_title', 'Diseño y materiales'),
+  getContent('home.process.step2_body', 'Elijo los hilados y juntas confirmamos detalles y fecha.'),
+  getContent('home.process.step3_title', 'Tejido a mano'),
+  getContent('home.process.step3_body', 'Empieza el ritual. Cada prenda lleva entre 2 y 6 semanas.'),
+  getContent('home.cta.title', '¿Tenés algo en mente?'),
+  getContent('home.cta.subtitle',
+    'Pedidos a medida, regalos especiales, primera prenda de bebé. Escribime y armamos lo que imaginás.'
+  ),
+]);
+
+const [step4Title, step4Body] = await Promise.all([
+  getContent('home.process.step4_title', 'Llega a vos'),
+  getContent('home.process.step4_body', 'Coordinamos envío a todo el país o retiro en Rosario.'),
+]);
 ---
 
 <BaseLayout
@@ -46,20 +103,17 @@ const CAT_GRADIENTS: Record<string, string> = {
           <span>Tejidos artesanales · Rosario · Desde 2011</span>
         </div>
         <h1 class="hero-title reveal reveal-delay-1">
-          Cada punto<br />guarda <em>una historia</em>.
+          {heroTitle1} <br /><em>{heroTitle2}</em>.
         </h1>
-        <p class="hero-lede reveal reveal-delay-2">
-          Prendas tejidas a mano, en crochet y dos agujas. Diseños únicos, hechos
-          a tu medida — con la calma y el cariño que sólo el tiempo puede dar.
-        </p>
+        <p class="hero-lede reveal reveal-delay-2" set:html={heroSubtitle} />
         <div class="hero-actions reveal reveal-delay-3">
           <a href="/tienda" class="btn btn-primary">
-            Explorar la tienda
+            {heroCtaPrimary}
             <svg class="arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
               ><path d="M5 12h14M13 5l7 7-7 7"></path></svg
             >
           </a>
-          <a href="/nosotros" class="btn btn-secondary">Conocé a Betina</a>
+          <a href="/nosotros" class="btn btn-secondary">{heroCtaSecondary}</a>
         </div>
 
         <div class="hero-stats reveal reveal-delay-3">
@@ -80,19 +134,31 @@ const CAT_GRADIENTS: Record<string, string> = {
 
       <div class="hero-visual reveal reveal-delay-2">
         <div class="hero-card hero-card-1">
-          <PlaceholderImg label="FOTO IG · Sweater terracota<br/>800 × 1000" />
+          {heroImg1 ? (
+            <img src={heroImg1} alt="Sweater terracota" loading="eager" decoding="async" class="hero-card-img" />
+          ) : (
+            <PlaceholderImg label="FOTO IG · Sweater terracota<br/>800 × 1000" />
+          )}
         </div>
         <div class="hero-card hero-card-2">
-          <PlaceholderImg
-            label="FOTO IG · Detalle tejido<br/>520 × 380"
-            gradient="linear-gradient(135deg, #DBD7D3, #B7B0A9)"
-          />
+          {heroImg2 ? (
+            <img src={heroImg2} alt="Detalle del tejido" loading="eager" decoding="async" class="hero-card-img" />
+          ) : (
+            <PlaceholderImg
+              label="FOTO IG · Detalle tejido<br/>520 × 380"
+              gradient="linear-gradient(135deg, #DBD7D3, #B7B0A9)"
+            />
+          )}
         </div>
         <div class="hero-card hero-card-3">
-          <PlaceholderImg
-            label="FOTO IG<br/>Manos tejiendo"
-            gradient="linear-gradient(135deg, #CCDEEA, #93BAD4)"
-          />
+          {heroImg3 ? (
+            <img src={heroImg3} alt="Manos tejiendo" loading="eager" decoding="async" class="hero-card-img" />
+          ) : (
+            <PlaceholderImg
+              label="FOTO IG<br/>Manos tejiendo"
+              gradient="linear-gradient(135deg, #CCDEEA, #93BAD4)"
+            />
+          )}
         </div>
         <div class="hero-tag tag-1">
           <span class="pulse"></span>
@@ -105,7 +171,7 @@ const CAT_GRADIENTS: Record<string, string> = {
     </div>
   </section>
 
-  <Marquee />
+  {marqueeEnabled && <Marquee />}
 
   <section class="cats">
     <div class="container" style="margin-bottom: 48px;">
@@ -129,13 +195,17 @@ const CAT_GRADIENTS: Record<string, string> = {
             class:list={['cat-tile', `reveal reveal-delay-${i % 3}`]}
           >
             <div class="cat-bg">
-              <PlaceholderImg
-                label={`FOTO · ${c.name}`}
-                gradient={
-                  CAT_GRADIENTS[c.id] ??
-                  'linear-gradient(135deg, var(--terracota-200), var(--terracota-700))'
-                }
-              />
+              {c.imageUrl ? (
+                <img src={c.imageUrl} alt={c.name} loading="lazy" decoding="async" class="cat-tile-img" />
+              ) : (
+                <PlaceholderImg
+                  label={`FOTO · ${c.name}`}
+                  gradient={
+                    CAT_GRADIENTS[c.id] ??
+                    'linear-gradient(135deg, var(--terracota-200), var(--terracota-700))'
+                  }
+                />
+              )}
             </div>
             <div class="cat-tile-content">
               <h3>{c.name}</h3>
@@ -158,7 +228,7 @@ const CAT_GRADIENTS: Record<string, string> = {
         <div>
           <div class="eyebrow reveal">— Lo nuevo de esta semana</div>
           <h2 class="reveal reveal-delay-1">
-            Recién salidos<br />de las agujas.
+            Recién salidos <br />de las agujas.
           </h2>
         </div>
         <p class="reveal reveal-delay-2">
@@ -183,19 +253,20 @@ const CAT_GRADIENTS: Record<string, string> = {
   <section class="section" style="background: var(--bg-warm);">
     <div class="story">
       <div class="story-img reveal">
-        <PlaceholderImg label="FOTO · Lili tejiendo<br/>retrato vertical 4:5" />
+        {storyImg ? (
+          <img src={storyImg} alt="Retrato de Lili tejiendo" loading="lazy" decoding="async" class="story-img-real" />
+        ) : (
+          <PlaceholderImg label="FOTO · Lili tejiendo<br/>retrato vertical 4:5" />
+        )}
       </div>
       <div class="story-content">
         <div class="eyebrow reveal" style="color: var(--accent-deep);">
-          — Sobre Lili
+          {storyEyebrow}
         </div>
         <h2 class="reveal reveal-delay-1" style="margin-top: 16px;">
-          El tejido es mi forma de meditar.
+          {storyTitle}
         </h2>
-        <p class="quote serif-italic reveal reveal-delay-2">
-          "Tejer me lleva a la cocina de mi mamá, a las tardes con mi abuela.
-          Ahora dejo una parte mía en cada prenda — la pienso para vos."
-        </p>
+        <p class="quote serif-italic reveal reveal-delay-2" set:html={storyBody} />
         <p class="reveal reveal-delay-3">
           Betina arrancó su emprendimiento en 2011 desde Rosario, con la
           convicción de que cada prenda merece tiempo, atención y cariño. Hoy son
@@ -217,7 +288,7 @@ const CAT_GRADIENTS: Record<string, string> = {
           <div class="eyebrow reveal" style="color: var(--terracota-200);">
             — El proceso
           </div>
-          <h2 class="reveal reveal-delay-1">De la lana<br />a tu puerta.</h2>
+          <h2 class="reveal reveal-delay-1">De la lana <br />a tu puerta.</h2>
         </div>
         <p class="reveal reveal-delay-2">
           Pedir un tejido a Betina es entrar en un ritmo distinto. No hay
@@ -226,32 +297,20 @@ const CAT_GRADIENTS: Record<string, string> = {
       </div>
       <div class="process-steps">
         <div class="step reveal">
-          <h4>Conversamos</h4>
-          <p>
-            Me contás qué buscás, para quién, en qué color y talle. Si tenés una
-            foto inspiradora, mejor.
-          </p>
+          <h4>{step1Title}</h4>
+          <p>{step1Body}</p>
         </div>
         <div class="step reveal reveal-delay-1">
-          <h4>Diseño y materiales</h4>
-          <p>
-            Elijo los hilados, te paso una propuesta y juntas confirmamos
-            detalles, fecha y presupuesto.
-          </p>
+          <h4>{step2Title}</h4>
+          <p>{step2Body}</p>
         </div>
         <div class="step reveal reveal-delay-2">
-          <h4>Tejido a mano</h4>
-          <p>
-            Empieza el ritual. Cada prenda lleva entre 2 y 6 semanas, según
-            complejidad y materiales.
-          </p>
+          <h4>{step3Title}</h4>
+          <p>{step3Body}</p>
         </div>
         <div class="step reveal reveal-delay-3">
-          <h4>Llega a vos</h4>
-          <p>
-            Coordinamos envío a todo el país o retiro en Rosario. La prenda viaja
-            con instrucciones de cuidado.
-          </p>
+          <h4>{step4Title}</h4>
+          <p>{step4Body}</p>
         </div>
       </div>
     </div>
@@ -259,11 +318,8 @@ const CAT_GRADIENTS: Record<string, string> = {
 
   <section class="cta-block">
     <div class="container">
-      <h2 class="serif reveal">¿Tenés algo en mente?</h2>
-      <p class="reveal reveal-delay-1">
-        Pedidos a medida, regalos especiales, primera prenda de bebé. Escribime
-        y armamos lo que imaginás.
-      </p>
+      <h2 class="serif reveal">{ctaTitle}</h2>
+      <p class="reveal reveal-delay-1">{ctaSubtitle}</p>
       <div class="reveal reveal-delay-2">
         <a
           href={ctaWa}
@@ -367,6 +423,20 @@ const CAT_GRADIENTS: Record<string, string> = {
   .hero-card :global(.placeholder-img) {
     position: absolute;
     inset: 0;
+  }
+  .hero-card-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .story-img-real {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
   }
   .hero-card-1 {
     top: 0;
@@ -524,6 +594,14 @@ const CAT_GRADIENTS: Record<string, string> = {
   .cat-bg :global(.placeholder-img) {
     position: absolute;
     inset: 0;
+  }
+  .cat-tile-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
   }
   .cat-tile:hover .cat-bg {
     transform: scale(1.06);

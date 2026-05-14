@@ -1,0 +1,11 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import CouponForm from '../../../components/admin/CouponForm.astro';
+import { getCategories } from '../../../lib/queries.ts';
+
+const cats = await getCategories();
+---
+
+<AdminLayout title="Nuevo cupón" subtitle="Descuentos o envío gratis para incentivar compras.">
+  <CouponForm action="/api/admin/cupones/crear" cats={cats} submitLabel="Crear cupón" />
+</AdminLayout>

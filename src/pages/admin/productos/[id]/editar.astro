@@ -1,0 +1,34 @@
+---
+import AdminLayout from '../../../../layouts/AdminLayout.astro';
+import ProductForm from '../../../../components/admin/ProductForm.astro';
+import ProductImagesEditor from '../../../../components/admin/ProductImagesEditor.astro';
+import {
+  getAdminProductById,
+  getCategories,
+  getProductImages,
+} from '../../../../lib/queries.ts';
+
+const { id } = Astro.params;
+if (!id) return Astro.redirect('/admin/productos');
+
+const [product, cats] = await Promise.all([
+  getAdminProductById(id),
+  getCategories(),
+]);
+
+if (!product) {
+  return Astro.redirect('/admin/productos?err=1&msg=Producto%20no%20encontrado.');
+}
+
+const images = await getProductImages(product.id);
+---
+
+<AdminLayout title={`Editar · ${product.name}`} subtitle="Modificá precio, stock, materiales y galería.">
+  <ProductImagesEditor product={product} images={images} />
+  <ProductForm
+    action={`/api/admin/productos/${product.id}/actualizar`}
+    product={product}
+    cats={cats}
+    submitLabel="Guardar cambios"
+  />
+</AdminLayout>

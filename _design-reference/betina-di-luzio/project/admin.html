@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dashboard · Admin Betina Di Luzio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+<link rel="stylesheet" href="assets/admin.css">
+</head>
+<body>
+<div class="admin-shell">
+  <div data-include="admin-side"></div>
+  <main class="admin-main">
+    <div data-include="admin-header"></div>
+
+    <!-- KPIs -->
+    <section class="kpis">
+      <div class="kpi-card">
+        <div class="label">Ingresos · 30 días</div>
+        <div class="num" data-count="2840000" data-fmt="ars">$0</div>
+        <div class="delta up">▲ 18.3% vs mes pasado</div>
+        <svg class="spark" width="64" height="28" viewBox="0 0 64 28"><polyline fill="none" stroke="#CB674C" stroke-width="1.5" points="0,22 10,18 20,20 30,12 40,15 52,8 64,4"/></svg>
+      </div>
+      <div class="kpi-card">
+        <div class="label">Pedidos completados</div>
+        <div class="num" data-count="42">0</div>
+        <div class="delta up">▲ 6 nuevos esta semana</div>
+        <svg class="spark" width="64" height="28" viewBox="0 0 64 28"><polyline fill="none" stroke="#595421" stroke-width="1.5" points="0,20 10,16 20,18 30,10 40,12 52,6 64,8"/></svg>
+      </div>
+      <div class="kpi-card">
+        <div class="label">Carritos abandonados</div>
+        <div class="num" data-count="14">0</div>
+        <div class="delta down">▼ 3 activos · recuperar</div>
+        <svg class="spark" width="64" height="28" viewBox="0 0 64 28"><polyline fill="none" stroke="#984C37" stroke-width="1.5" points="0,12 10,15 20,10 30,18 40,14 52,20 64,16"/></svg>
+      </div>
+      <div class="kpi-card">
+        <div class="label">Ticket promedio</div>
+        <div class="num" data-count="67619" data-fmt="ars">$0</div>
+        <div class="delta up">▲ 4.2% vs mes pasado</div>
+        <svg class="spark" width="64" height="28" viewBox="0 0 64 28"><polyline fill="none" stroke="#6C95B0" stroke-width="1.5" points="0,18 10,20 20,14 30,16 40,10 52,12 64,6"/></svg>
+      </div>
+    </section>
+
+    <!-- Conversion + traffic -->
+    <section class="kpis" style="grid-template-columns: 1fr 1fr 1fr; margin-bottom: 32px;">
+      <div class="kpi-card"><div class="label">Tasa de conversión</div><div class="num">3.8<span style="font-size: 22px;">%</span></div><div class="delta up">▲ 0.6% vs mes pasado</div></div>
+      <div class="kpi-card"><div class="label">Visitas únicas · 30d</div><div class="num" data-count="4280">0</div><div class="delta up">▲ 12% · pico el 14/04</div></div>
+      <div class="kpi-card"><div class="label">Stock bajo (alerta)</div><div class="num" style="color: var(--accent-deep);" data-count="5">0</div><div class="delta down">3 productos sin stock</div></div>
+    </section>
+
+    <!-- Chart + Top categorías -->
+    <section class="row-2">
+      <div class="panel">
+        <div class="panel-head">
+          <h3>Ingresos por mes</h3>
+          <select><option>Últimos 6 meses</option><option>Año actual</option><option>2025 vs 2026</option></select>
+        </div>
+        <div class="chart">
+          <svg viewBox="0 0 600 240" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="grad1" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#CB674C" stop-opacity="0.3"/>
+                <stop offset="100%" stop-color="#CB674C" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <!-- Grid -->
+            <line x1="0" y1="60" x2="600" y2="60" stroke="#E8D7CF" stroke-dasharray="3 3"/>
+            <line x1="0" y1="120" x2="600" y2="120" stroke="#E8D7CF" stroke-dasharray="3 3"/>
+            <line x1="0" y1="180" x2="600" y2="180" stroke="#E8D7CF" stroke-dasharray="3 3"/>
+            <!-- Area -->
+            <path d="M 30 180 L 130 140 L 230 160 L 330 100 L 430 80 L 530 50 L 530 220 L 30 220 Z" fill="url(#grad1)"/>
+            <!-- Line -->
+            <polyline fill="none" stroke="#CB674C" stroke-width="2.5" points="30,180 130,140 230,160 330,100 430,80 530,50"/>
+            <!-- Points -->
+            <g fill="#CB674C">
+              <circle cx="30" cy="180" r="4"/><circle cx="130" cy="140" r="4"/><circle cx="230" cy="160" r="4"/>
+              <circle cx="330" cy="100" r="4"/><circle cx="430" cy="80" r="4"/><circle cx="530" cy="50" r="5" stroke="white" stroke-width="2"/>
+            </g>
+            <!-- Labels -->
+            <g font-family="JetBrains Mono" font-size="10" fill="#918B85">
+              <text x="30" y="235" text-anchor="middle">Nov</text>
+              <text x="130" y="235" text-anchor="middle">Dic</text>
+              <text x="230" y="235" text-anchor="middle">Ene</text>
+              <text x="330" y="235" text-anchor="middle">Feb</text>
+              <text x="430" y="235" text-anchor="middle">Mar</text>
+              <text x="530" y="235" text-anchor="middle">Abr</text>
+            </g>
+          </svg>
+        </div>
+        <div class="legend">
+          <span><span class="dot" style="background:#CB674C"></span>Ingresos</span>
+          <span style="color: var(--ink);">Abr 2026 · <strong>$2.840.000</strong></span>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h3>Por categoría</h3></div>
+        <div class="donut">
+          <svg viewBox="0 0 42 42">
+            <circle cx="21" cy="21" r="15.915" fill="white" stroke="#F0E1DA" stroke-width="6"/>
+            <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#CB674C" stroke-width="6" stroke-dasharray="42 100" stroke-dashoffset="0"/>
+            <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#595421" stroke-width="6" stroke-dasharray="22 100" stroke-dashoffset="-42"/>
+            <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#6C95B0" stroke-width="6" stroke-dasharray="18 100" stroke-dashoffset="-64"/>
+            <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#984C37" stroke-width="6" stroke-dasharray="12 100" stroke-dashoffset="-82"/>
+            <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#918B85" stroke-width="6" stroke-dasharray="6 100" stroke-dashoffset="-94"/>
+            <text x="21" y="22" text-anchor="middle" font-family="Cormorant Garamond" font-size="6" fill="#2B1510">42%</text>
+          </svg>
+          <ul class="donut-list">
+            <li><span class="lbl"><span class="dot" style="background:#CB674C; width:8px; height:8px; border-radius:50%; display:inline-block; margin-right:8px;"></span>Sweaters</span><span class="amt">42%</span></li>
+            <li><span class="lbl"><span style="background:#595421; width:8px; height:8px; border-radius:50%; display:inline-block; margin-right:8px;"></span>Cardigans</span><span class="amt">22%</span></li>
+            <li><span class="lbl"><span style="background:#6C95B0; width:8px; height:8px; border-radius:50%; display:inline-block; margin-right:8px;"></span>Mantas</span><span class="amt">18%</span></li>
+            <li><span class="lbl"><span style="background:#984C37; width:8px; height:8px; border-radius:50%; display:inline-block; margin-right:8px;"></span>Bebés</span><span class="amt">12%</span></li>
+            <li><span class="lbl"><span style="background:#918B85; width:8px; height:8px; border-radius:50%; display:inline-block; margin-right:8px;"></span>Otros</span><span class="amt">6%</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Top productos + Stock alert -->
+    <section class="row-2">
+      <div class="panel">
+        <div class="panel-head"><h3>Productos más vendidos</h3><a href="admin-productos.html" style="font-family: var(--mono); font-size: 11px; color: var(--accent-deep); text-transform: uppercase; letter-spacing: 0.15em;">Ver todos →</a></div>
+        <table class="table">
+          <thead><tr><th>Producto</th><th>Ventas</th><th>Vistas</th><th>Conv.</th><th>Ingresos</th></tr></thead>
+          <tbody>
+            <tr><td><div class="product-cell"><div class="img" style="background: linear-gradient(135deg,#E2927C,#984C37);"></div><div><strong>Sweater Otoño Terracota</strong><br/><span style="font-family:var(--mono); font-size:11px; color:var(--ink-soft);">SW-001</span></div></div></td><td>12</td><td>842</td><td>1.4%</td><td>$1.068.000</td></tr>
+            <tr><td><div class="product-cell"><div class="img" style="background: linear-gradient(135deg,#DBD7D3,#918B85);"></div><div><strong>Manta Rosario</strong><br/><span style="font-family:var(--mono); font-size:11px; color:var(--ink-soft);">MA-003</span></div></div></td><td>9</td><td>610</td><td>1.5%</td><td>$1.305.000</td></tr>
+            <tr><td><div class="product-cell"><div class="img" style="background: linear-gradient(135deg,#FCF5F4,#EEC5BA);"></div><div><strong>Manta Bebé Cuna</strong><br/><span style="font-family:var(--mono); font-size:11px; color:var(--ink-soft);">BE-010</span></div></div></td><td>8</td><td>518</td><td>1.5%</td><td>$624.000</td></tr>
+            <tr><td><div class="product-cell"><div class="img" style="background: linear-gradient(135deg,#EEC5BA,#CB674C);"></div><div><strong>Cardigan Esencial Crema</strong><br/><span style="font-family:var(--mono); font-size:11px; color:var(--ink-soft);">CA-002</span></div></div></td><td>7</td><td>720</td><td>1.0%</td><td>$714.000</td></tr>
+            <tr><td><div class="product-cell"><div class="img" style="background: linear-gradient(135deg,#93BAD4,#537389);"></div><div><strong>Gorro Cable Azul</strong><br/><span style="font-family:var(--mono); font-size:11px; color:var(--ink-soft);">AC-008</span></div></div></td><td>11</td><td>340</td><td>3.2%</td><td>$308.000</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="panel alert">
+        <div class="panel-head"><h3>Stock bajo</h3><a href="admin-stock.html" style="font-family: var(--mono); font-size: 11px; color: var(--accent-deep); text-transform: uppercase; letter-spacing: 0.15em;">Ver →</a></div>
+        <ul style="list-style: none; display: flex; flex-direction: column; gap: 4px;">
+          <li style="display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--line-soft);">
+            <div>
+              <div style="font-weight: 500;">Sweater Granny Patchwork</div>
+              <div style="font-family: var(--mono); font-size: 11px; color: var(--ink-soft);">SW-012</div>
+            </div>
+            <span class="tag red">1 unidad</span>
+          </li>
+          <li style="display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--line-soft);">
+            <div>
+              <div style="font-weight: 500;">Cardigan Esencial Crema</div>
+              <div style="font-family: var(--mono); font-size: 11px; color: var(--ink-soft);">CA-002</div>
+            </div>
+            <span class="tag red">2 unidades</span>
+          </li>
+          <li style="display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--line-soft);">
+            <div>
+              <div style="font-weight: 500;">Cardigan Largo Tweed</div>
+              <div style="font-family: var(--mono); font-size: 11px; color: var(--ink-soft);">CA-009</div>
+            </div>
+            <span class="tag amber">2 unidades</span>
+          </li>
+          <li style="display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--line-soft);">
+            <div>
+              <div style="font-weight: 500;">Sweater Cuello Alto Tinta</div>
+              <div style="font-family: var(--mono); font-size: 11px; color: var(--ink-soft);">SW-006</div>
+            </div>
+            <span class="tag amber">3 unidades</span>
+          </li>
+          <li style="display: flex; justify-content: space-between; align-items: center; padding: 14px 0;">
+            <div>
+              <div style="font-weight: 500;">Manta Rosario</div>
+              <div style="font-family: var(--mono); font-size: 11px; color: var(--ink-soft);">MA-003</div>
+            </div>
+            <span class="tag amber">3 unidades</span>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Carritos abandonados -->
+    <section class="panel" style="margin-bottom: 32px;">
+      <div class="panel-head"><h3>Carritos abandonados (recientes)</h3><span style="font-family: var(--mono); font-size: 11px; color: var(--ink-soft);">$485.000 en juego</span></div>
+      <table class="table">
+        <thead><tr><th>Cliente</th><th>Productos</th><th>Total</th><th>Tiempo</th><th>Estado</th><th></th></tr></thead>
+        <tbody>
+          <tr><td><strong>María L.</strong><br/><span style="font-family:var(--mono); font-size:11px; color:var(--ink-soft);">maria.l@gmail.com</span></td><td>Sweater Otoño Terracota · M</td><td>$89.000</td><td>2h</td><td><span class="tag amber">Activo</span></td><td><a href="#" style="font-family:var(--mono); font-size:11px; color:var(--accent-deep); text-transform:uppercase;">Recuperar</a></td></tr>
+          <tr><td><strong>Carolina F.</strong><br/><span style="font-family:var(--mono); font-size:11px; color:var(--ink-soft);">caro@hotmail.com</span></td><td>Manta Rosario + Almohadón Telar</td><td>$187.000</td><td>5h</td><td><span class="tag amber">Activo</span></td><td><a href="#" style="font-family:var(--mono); font-size:11px; color:var(--accent-deep); text-transform:uppercase;">Recuperar</a></td></tr>
+          <tr><td><strong>Sofía R.</strong><br/><span style="font-family:var(--mono); font-size:11px; color:var(--ink-soft);">sofia.r@gmail.com</span></td><td>Cardigan Largo Tweed + Bufanda</td><td>$172.000</td><td>1d</td><td><span class="tag gray">Frío</span></td><td><a href="#" style="font-family:var(--mono); font-size:11px; color:var(--accent-deep); text-transform:uppercase;">Recuperar</a></td></tr>
+          <tr><td><strong>Lucía M.</strong><br/><span style="font-family:var(--mono); font-size:11px; color:var(--ink-soft);">lu.m@yahoo.com</span></td><td>Conjunto Bebé Nube</td><td>$64.000</td><td>2d</td><td><span class="tag gray">Frío</span></td><td><a href="#" style="font-family:var(--mono); font-size:11px; color:var(--accent-deep); text-transform:uppercase;">Recuperar</a></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+  </main>
+</div>
+
+<script src="assets/data.js"></script>
+<script src="assets/admin-layout.js"></script>
+<script>
+window.BDLAdmin.mount('dash', 'Buen día, Lili.', 'Esto es lo que pasó en tu tienda hoy.');
+// Animated counters
+document.querySelectorAll('[data-count]').forEach(el => {
+  const target = +el.dataset.count;
+  const fmt = el.dataset.fmt;
+  let cur = 0; const step = target / 60;
+  const t = setInterval(() => {
+    cur += step;
+    if (cur >= target) { cur = target; clearInterval(t); }
+    el.textContent = fmt === 'ars' ? '$' + Math.round(cur).toLocaleString('es-AR') : Math.floor(cur).toLocaleString('es-AR');
+  }, 22);
+});
+</script>
+</body>
+</html>

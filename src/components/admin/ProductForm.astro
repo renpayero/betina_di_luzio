@@ -1,0 +1,147 @@
+---
+import type { Category, Product } from '../../db/schema.ts';
+import ColorPalettePicker from './ColorPalettePicker.astro';
+
+interface Props {
+  action: string;
+  product?: Product | null;
+  cats: Category[];
+  submitLabel: string;
+}
+const { action, product, cats, submitLabel } = Astro.props;
+const p = product;
+---
+
+<form method="post" action={action} class="form-card">
+  <div class="field-row">
+    <div class="field">
+      <label for="name">Nombre</label>
+      <input type="text" id="name" name="name" value={p?.name ?? ''} required maxlength="100" />
+    </div>
+    <div class="field">
+      <label for="sku">SKU</label>
+      <input type="text" id="sku" name="sku" value={p?.sku ?? ''} placeholder="Auto si se deja vacío" maxlength="32" />
+    </div>
+  </div>
+
+  <div class="field-row">
+    <div class="field">
+      <label for="slug">Slug</label>
+      <input type="text" id="slug" name="slug" value={p?.slug ?? ''} placeholder="Auto si se deja vacío" maxlength="80" />
+      <span class="help">URL amigable. Ejemplo: <code>sweater-otono-terracota</code></span>
+    </div>
+    <div class="field">
+      <label for="categoryId">Categoría</label>
+      <select id="categoryId" name="categoryId" required>
+        {
+          cats.map((c) => (
+            <option value={c.id} selected={c.id === p?.categoryId}>
+              {c.name}
+            </option>
+          ))
+        }
+      </select>
+    </div>
+  </div>
+
+  <div class="field-row cols-3">
+    <div class="field">
+      <label for="price">Precio (ARS)</label>
+      <input type="number" id="price" name="price" value={p?.price ?? ''} required min="0" max="100000000" />
+    </div>
+    <div class="field">
+      <label for="oldPrice">Precio anterior (opcional)</label>
+      <input type="number" id="oldPrice" name="oldPrice" value={p?.oldPrice ?? ''} min="0" max="100000000" />
+    </div>
+    <div class="field">
+      <label for="status">Estado de marketing</label>
+      <select id="status" name="status">
+        <option value="" selected={!p?.status}>—</option>
+        <option value="new" selected={p?.status === 'new'}>Nuevo</option>
+        <option value="sale" selected={p?.status === 'sale'}>En oferta</option>
+        <option value="bestseller" selected={p?.status === 'bestseller'}>Top</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="field-row cols-3">
+    <div class="field">
+      <label for="stock">Stock</label>
+      <input type="number" id="stock" name="stock" value={p?.stock ?? 0} required min="0" max="9999" />
+    </div>
+    <div class="field">
+      <label for="minStock">Mínimo de alerta</label>
+      <input type="number" id="minStock" name="minStock" value={p?.minStock ?? 2} required min="0" max="100" />
+      <span class="help">Avisamos en el dashboard si baja de este número.</span>
+    </div>
+    <div class="field">
+      <label for="isPublished">Visibilidad</label>
+      <select id="isPublished" name="isPublished">
+        <option value="true" selected={p?.isPublished !== false}>Visible en la tienda</option>
+        <option value="false" selected={p?.isPublished === false}>Oculto (borrador)</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="field">
+    <label for="materials">Materiales</label>
+    <input type="text" id="materials" name="materials" value={p?.materials ?? ''} required maxlength="200" placeholder="Lana merino · 100%" />
+  </div>
+
+  <div class="field">
+    <label for="description">Descripción</label>
+    <textarea id="description" name="description" required maxlength="2000">{p?.description ?? ''}</textarea>
+  </div>
+
+  <div class="field">
+    <label for="placeholder">Placeholder (texto sobre la foto)</label>
+    <input type="text" id="placeholder" name="placeholder" value={p?.placeholder ?? ''} required maxlength="60" placeholder="SWEATER · TRENZADO · TERRACOTA" />
+  </div>
+
+  <div class="field">
+    <label for="sizes">Talles</label>
+    <input
+      type="text"
+      id="sizes"
+      name="sizes"
+      value={(p?.sizes ?? []).join(', ')}
+      placeholder="S, M, L"
+    />
+    <span class="help">Separá con coma: <code>S, M, L</code> o <code>Única</code>.</span>
+  </div>
+
+  <ColorPalettePicker
+    name="colors"
+    initial={(p?.colors ?? []).join(',')}
+    label="Colores disponibles"
+    help="Tocá los colores que tiene esta pieza. Podés elegir varios."
+  />
+
+  <div class="field-row">
+    <div class="field">
+      <span class="field-label">Destacado en home</span>
+      <input type="hidden" name="isFeatured" value="false" />
+      <label class="toggle">
+        <input
+          type="checkbox"
+          name="isFeatured"
+          value="true"
+          checked={p?.isFeatured === true}
+        />
+        <span>Mostrar este producto en la portada</span>
+      </label>
+    </div>
+    <div class="field">
+      <label for="sortOrder">Orden de aparición</label>
+      <input type="number" id="sortOrder" name="sortOrder" value={p?.sortOrder ?? 0} min="0" max="9999" />
+      <span class="help">Número más bajo aparece primero.</span>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <a href="/admin/productos" class="btn-secondary">← Cancelar</a>
+    <div class="right">
+      <button type="submit" class="btn-add">{submitLabel}</button>
+    </div>
+  </div>
+</form>

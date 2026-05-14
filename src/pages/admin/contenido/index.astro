@@ -1,0 +1,149 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import AdminTabs from '../../../components/admin/AdminTabs.astro';
+import ImageInput from '../../../components/admin/ImageInput.astro';
+import ColorSinglePicker from '../../../components/admin/ColorSinglePicker.astro';
+import { getContentBlocks } from '../../../lib/queries.ts';
+
+const isColorKey = (k: string): boolean =>
+  k.endsWith('.bg') || k.endsWith('.color') || k.includes('_color');
+const isBoolKey = (k: string): boolean => k.endsWith('.enabled');
+
+const params = Astro.url.searchParams;
+const section = params.get('section') ?? 'home';
+
+const all = await getContentBlocks(section);
+const sections: ReadonlyArray<{ key: string; label: string }> = [
+  { key: 'home', label: 'Banners de Home' },
+  { key: 'about', label: 'Sección Nosotros' },
+  { key: 'footer', label: 'Footer' },
+  { key: 'seo', label: 'SEO' },
+];
+const tabs = sections.map((s) => ({
+  label: s.label,
+  href: `/admin/contenido?section=${s.key}`,
+  isActive: section === s.key,
+}));
+
+// Group blocks by visual prefix (home.hero, home.marquee, home.cta).
+const groups = new Map<string, typeof all>();
+for (const b of all) {
+  const grp = b.key.split('.').slice(0, 2).join('.');
+  if (!groups.has(grp)) groups.set(grp, []);
+  groups.get(grp)!.push(b);
+}
+
+const groupTitles: Record<string, string> = {
+  'home.hero': 'Hero principal',
+  'home.marquee': 'Marquee · Frase rotativa',
+  'home.story': 'Story · Manos de Lili',
+  'home.process': 'Proceso · 4 pasos',
+  'home.cta': 'CTA inferior — "¿Tenés algo en mente?"',
+  'about.h1': 'Hero de Nosotros',
+  'about.lede': 'Sub-título de Nosotros',
+  'about.portrait1': 'Retrato 1',
+  'about.portrait2': 'Retrato 2',
+  'about.portrait3': 'Retrato 3',
+  'footer.tagline': 'Footer · tagline',
+  'seo.default_title_suffix': 'SEO · Sufijo de título',
+  'seo.default_description': 'SEO · Descripción default',
+};
+const groupTitle = (g: string): string => groupTitles[g] ?? g;
+
+const uploadSection = (s: string): 'home' | 'about' | 'category' | 'product' | 'generic' => {
+  if (s === 'home' || s === 'about' || s === 'category' || s === 'product') return s;
+  return 'generic';
+};
+
+const aspectFromKey = (key: string): string => {
+  if (key.includes('portrait')) return '3 / 4';
+  if (key.includes('hero.image1')) return '4 / 5';
+  if (key.includes('hero.image2')) return '3 / 4';
+  if (key.includes('hero.image3')) return '1 / 1';
+  if (key.includes('story.image')) return '4 / 5';
+  return '4 / 5';
+};
+---
+
+<AdminLayout title="Contenido" subtitle="Editá banners, textos y secciones sin tocar código.">
+  <AdminTabs tabs={tabs} />
+
+  {
+    [...groups.entries()].length === 0 ? (
+      <p style="color:var(--ink-soft); font-style:italic;">Sin bloques editables en esta sección.</p>
+    ) : (
+      [...groups.entries()].map(([gname, blocks]) => (
+        <div class="form-card">
+          <div class="panel-head"
+            style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+            <h3>{groupTitle(gname)}</h3>
+            <span style="font-family:var(--mono); font-size:10px; color:var(--ink-soft);">
+              {blocks.length} {blocks.length === 1 ? 'campo' : 'campos'}
+            </span>
+          </div>
+          <form method="post" action={`/api/admin/contenido/actualizar?section=${section}`}>
+            {blocks.map((b) => (
+              <div class="field">
+                {b.kind === 'image' ? (
+                  <ImageInput
+                    name={b.key}
+                    initialUrl={b.value}
+                    label={b.label}
+                    section={uploadSection(section)}
+                    aspectRatio={aspectFromKey(b.key)}
+                    help={`Actualizado ${b.updatedAt.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' })}`}
+                  />
+                ) : isColorKey(b.key) ? (
+                  <ColorSinglePicker
+                    name={b.key}
+                    initial={b.value}
+                    label={b.label}
+                    help="Elegí un color de la paleta o uno personalizado."
+                  />
+                ) : isBoolKey(b.key) ? (
+                  <>
+                    <input type="hidden" name={b.key} value="false" />
+                    <label class="toggle">
+                      <input
+                        type="checkbox"
+                        name={b.key}
+                        value="true"
+                        checked={b.value === 'true' || b.value === '1' || b.value === 'on'}
+                      />
+                      <span>{b.label}</span>
+                    </label>
+                  </>
+                ) : (
+                  <>
+                    <label for={b.key}>{b.label}</label>
+                    {b.kind === 'rich' ? (
+                      <textarea id={b.key} name={b.key} maxlength="2000" required>{b.value}</textarea>
+                    ) : (
+                      <input
+                        type="text"
+                        id={b.key}
+                        name={b.key}
+                        value={b.value}
+                        maxlength="500"
+                        required
+                      />
+                    )}
+                    <span class="help">
+                      Actualizado {b.updatedAt.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                    </span>
+                  </>
+                )}
+              </div>
+            ))}
+            <div class="form-actions">
+              <span></span>
+              <div class="right">
+                <button type="submit" class="btn-add">Guardar cambios</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      ))
+    )
+  }
+</AdminLayout>

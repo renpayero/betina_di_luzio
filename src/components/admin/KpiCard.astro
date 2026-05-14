@@ -1,0 +1,95 @@
+---
+interface Props {
+  label: string;
+  value?: string;
+  count?: number;
+  format?: 'plain' | 'ars';
+  delta?: string;
+  trend?: 'up' | 'down' | 'flat';
+  numStyle?: string;
+  spark?: string;
+  href?: string;
+}
+const {
+  label,
+  value,
+  count,
+  format = 'plain',
+  delta,
+  trend = 'flat',
+  numStyle = '',
+  spark,
+  href,
+} = Astro.props;
+const deltaClass = trend === 'up' ? 'up' : trend === 'down' ? 'down' : '';
+const initialDisplay =
+  typeof count === 'number'
+    ? format === 'ars'
+      ? '$0'
+      : '0'
+    : value ?? '';
+const Tag = href ? 'a' : 'div';
+---
+
+<Tag class:list={['kpi-card', { 'kpi-card--link': !!href }]} href={href}>
+  <div class="label">{label}</div>
+  {typeof count === 'number' ? (
+    <div
+      class="num"
+      style={numStyle}
+      data-count={count}
+      data-fmt={format}
+    >
+      {initialDisplay}
+    </div>
+  ) : (
+    <div class="num" style={numStyle}>{initialDisplay}</div>
+  )}
+  {delta && <div class:list={['delta', deltaClass]}>{delta}</div>}
+  {
+    spark && (
+      <svg class="spark" width="64" height="28" viewBox="0 0 64 28" aria-hidden="true">
+        <polyline fill="none" stroke="#CB674C" stroke-width="1.5" points={spark} />
+      </svg>
+    )
+  }
+  {href && (
+    <svg class="kpi-card__arrow" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M5 12h14M13 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="1.8"/>
+    </svg>
+  )}
+</Tag>
+
+<style>
+  .kpi-card--link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+  .kpi-card--link {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .kpi-card--link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(54, 22, 14, 0.1);
+  }
+  .kpi-card--link:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  .kpi-card__arrow {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    width: 16px;
+    height: 16px;
+    color: var(--ink-soft);
+    opacity: 0;
+    transition: opacity 0.2s, transform 0.2s, color 0.2s;
+  }
+  .kpi-card--link:hover .kpi-card__arrow {
+    opacity: 1;
+    transform: translateX(2px);
+    color: var(--accent-deep);
+  }
+</style>

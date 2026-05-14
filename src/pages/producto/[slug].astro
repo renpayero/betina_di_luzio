@@ -7,7 +7,7 @@ import {
   getCategoryById,
   getProductBySlug,
   getProductImages,
-  getRelatedProducts,
+  getRelatedProductsWithHero,
 } from '../../lib/queries.ts';
 import { fmtARS, calcDiscount } from '../../lib/format.ts';
 import { colorName } from '../../lib/colors.ts';
@@ -24,7 +24,7 @@ if (!product) {
 
 const [category, related, images] = await Promise.all([
   getCategoryById(product.categoryId),
-  getRelatedProducts(product.id, product.categoryId, 4),
+  getRelatedProductsWithHero(product.id, product.categoryId, 4),
   getProductImages(product.id),
 ]);
 
@@ -44,9 +44,12 @@ const galleryThumbs = [
   'Espalda',
 ];
 const initialColor = product.colors[0] ?? '#CB674C';
+const mainGradient = `linear-gradient(135deg, ${initialColor}40, ${initialColor}90)`;
 const initialSize = product.sizes[0] ?? 'Único';
 const lowStock = product.stock <= 3;
-const stockMsg = lowStock ? `Sólo ${product.stock} disponibles` : 'En stock';
+const stockMsg = lowStock
+  ? `Sólo ${product.stock} ${product.stock === 1 ? 'disponible' : 'disponibles'}`
+  : 'En stock';
 const stockColor = lowStock ? 'var(--accent-deep)' : 'var(--ink-soft)';
 
 const trail = [
@@ -81,27 +84,42 @@ trail.push({ name: product.name, url: `/producto/${product.slug}` });
         <div class="gallery-thumbs" role="tablist" aria-label="Galería de imágenes">
           {
             images.length > 0
-              ? images.map((img, i) => {
-                  const c = product.colors[i % product.colors.length] ?? '#CB674C';
-                  const grad = `linear-gradient(135deg, ${c}40, ${c}90)`;
-                  return (
-                    <button
-                      type="button"
-                      class:list={['thumb', { active: i === 0 }]}
-                      data-thumb-idx={i}
-                      data-src={img.url}
-                      role="tab"
-                      aria-selected={i === 0 ? 'true' : 'false'}
-                      aria-label={img.alt}
-                    >
-                      <PlaceholderImg
-                        label={img.alt}
-                        gradient={grad}
-                        labelStyle="font-size:9px"
-                      />
-                    </button>
+              ? (() => {
+                  const heroIdx = Math.max(
+                    images.findIndex((i) => i.isHero),
+                    0
                   );
-                })
+                  return images.map((img, i) => {
+                    const c = product.colors[i % product.colors.length] ?? '#CB674C';
+                    const grad = `linear-gradient(135deg, ${c}40, ${c}90)`;
+                    const isReal = img.url.startsWith('/uploads/');
+                    const isActive = i === heroIdx;
+                    return (
+                      <button
+                        type="button"
+                        class:list={['thumb', { active: isActive }]}
+                        data-thumb-idx={i}
+                        data-url={img.url}
+                        data-real={String(isReal)}
+                        data-label={img.alt}
+                        data-grad={grad}
+                        role="tab"
+                        aria-selected={isActive ? 'true' : 'false'}
+                        aria-label={img.alt}
+                      >
+                        {isReal ? (
+                          <img src={img.url} alt={img.alt} loading="lazy" decoding="async" class="thumb-img" />
+                        ) : (
+                          <PlaceholderImg
+                            label={img.alt}
+                            gradient={grad}
+                            labelStyle="font-size:9px"
+                          />
+                        )}
+                      </button>
+                    );
+                  });
+                })()
               : galleryThumbs.map((label, i) => {
                   const c = product.colors[i % product.colors.length] ?? '#CB674C';
                   const grad = `linear-gradient(135deg, ${c}40, ${c}90)`;
@@ -110,6 +128,9 @@ trail.push({ name: product.name, url: `/producto/${product.slug}` });
                       type="button"
                       class:list={['thumb', { active: i === 0 }]}
                       data-thumb-idx={i}
+                      data-real="false"
+                      data-label={label}
+                      data-grad={grad}
                       role="tab"
                       aria-selected={i === 0 ? 'true' : 'false'}
                       aria-label={label}
@@ -125,7 +146,26 @@ trail.push({ name: product.name, url: `/producto/${product.slug}` });
           }
         </div>
         <div class="gallery-main" role="tabpanel" aria-live="polite">
-          <PlaceholderImg label={images[0]?.alt ?? product.placeholder} />
+          {(() => {
+            const heroImg = images.find((i) => i.isHero) ?? images[0];
+            if (heroImg && heroImg.url.startsWith('/uploads/')) {
+              return (
+                <img
+                  src={heroImg.url}
+                  alt={heroImg.alt}
+                  loading="eager"
+                  decoding="async"
+                  class="gallery-main-img"
+                />
+              );
+            }
+            return (
+              <PlaceholderImg
+                label={heroImg?.alt ?? product.placeholder}
+                gradient={mainGradient}
+              />
+            );
+          })()}
         </div>
       </div>
 
@@ -136,6 +176,7 @@ trail.push({ name: product.name, url: `/producto/${product.slug}` });
         data-product-name={product.name}
         data-product-price={product.price}
         data-product-placeholder={product.placeholder}
+        data-product-stock={product.stock}
         data-wa={WHATSAPP_NUMBER}
       >
         {statusLabel && <div class="eyebrow">— {statusLabel}</div>}
@@ -282,8 +323,14 @@ trail.push({ name: product.name, url: `/producto/${product.slug}` });
   }
   .gallery-thumbs .thumb.active { opacity: 1; }
   .gallery-thumbs .thumb :global(.placeholder-img) { position: absolute; inset: 0; }
+  .gallery-thumbs .thumb :global(.thumb-img) {
+    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block;
+  }
   .gallery-main { aspect-ratio: 3 / 4; position: relative; overflow: hidden; }
   .gallery-main :global(.placeholder-img) { position: absolute; inset: 0; }
+  .gallery-main :global(.gallery-main-img) {
+    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block;
+  }
 
   .pdp-info h1 { font-size: var(--t-h2); margin: 16px 0 24px; line-height: 1.05; }
   .pdp-info .price-row { display: flex; align-items: baseline; gap: 12px; margin-bottom: 32px; }
@@ -383,6 +430,7 @@ trail.push({ name: product.name, url: `/producto/${product.slug}` });
     const price = Number(root.dataset.productPrice ?? '0');
     const placeholder = root.dataset.productPlaceholder ?? '';
     const slug = root.dataset.productSlug ?? '';
+    const productStock = Number(root.dataset.productStock ?? '0');
     const wa = root.dataset.wa ?? '';
 
     let selColor =
@@ -445,6 +493,10 @@ trail.push({ name: product.name, url: `/producto/${product.slug}` });
       if (qtyEl) qtyEl.textContent = String(qty);
     });
 
+    const main = document.querySelector<HTMLElement>('.gallery-main');
+    const escapeAttr = (s: string) =>
+      s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
     document.querySelectorAll<HTMLButtonElement>('.thumb').forEach((t) => {
       t.addEventListener('click', () => {
         document.querySelectorAll('.thumb').forEach((x) => {
@@ -453,6 +505,16 @@ trail.push({ name: product.name, url: `/producto/${product.slug}` });
         });
         t.classList.add('active');
         t.setAttribute('aria-selected', 'true');
+        if (!main) return;
+        const label = t.dataset.label ?? '';
+        const grad = t.dataset.grad ?? '';
+        const url = t.dataset.url ?? '';
+        const isReal = t.dataset.real === 'true';
+        if (isReal && url) {
+          main.innerHTML = `<img src="${escapeAttr(url)}" alt="${escapeAttr(label)}" loading="eager" decoding="async" class="gallery-main-img">`;
+        } else {
+          main.innerHTML = `<div class="placeholder-img" style="background: ${escapeAttr(grad)};"><div class="placeholder-label">${escapeAttr(label)}</div></div>`;
+        }
       });
     });
 
@@ -473,6 +535,7 @@ trail.push({ name: product.name, url: `/producto/${product.slug}` });
         size: selSize,
         qty,
         placeholder,
+        stock: productStock,
       });
       const orig = addBtn.textContent;
       addBtn.disabled = true;

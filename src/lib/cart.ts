@@ -8,6 +8,12 @@ export type CartItem = {
   size?: string;
   placeholder?: string;
   slug?: string;
+  stock?: number;
+};
+
+const clampQty = (raw: number, stock?: number): number => {
+  const min = Math.max(1, raw);
+  return typeof stock === 'number' && stock > 0 ? Math.min(min, stock) : min;
 };
 
 const STORAGE_KEY = 'bdl_cart_v1';
@@ -61,9 +67,15 @@ export const cart = {
     const key = itemKey(item.id, item.size, item.color);
     const existing = items.find((i) => i.key === key);
     if (existing) {
-      existing.qty += item.qty ?? 1;
+      const stock = item.stock ?? existing.stock;
+      existing.qty = clampQty(existing.qty + (item.qty ?? 1), stock);
+      if (typeof item.stock === 'number') existing.stock = item.stock;
     } else {
-      items.push({ ...item, key, qty: item.qty ?? 1 });
+      items.push({
+        ...item,
+        key,
+        qty: clampQty(item.qty ?? 1, item.stock),
+      });
     }
     write(items);
   },
@@ -74,7 +86,7 @@ export const cart = {
     const items = read();
     const item = items.find((i) => i.key === key);
     if (!item) return;
-    item.qty = Math.max(1, qty);
+    item.qty = clampQty(qty, item.stock);
     write(items);
   },
   clear(): void {

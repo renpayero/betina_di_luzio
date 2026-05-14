@@ -13,6 +13,7 @@ const next = Astro.url.searchParams.get('next') ?? '';
 const action = next
   ? `/api/auth/login?next=${encodeURIComponent(next)}`
   : '/api/auth/login';
+const rememberedEmail = Astro.cookies.get('bdl_remember_email')?.value ?? '';
 ---
 
 <BaseLayout title="Ingresar" description="Acceso al panel de administración." active="login" hideChrome noindex>
@@ -24,7 +25,7 @@ const action = next
       <h2 class="serif">Cada punto guarda <em>una historia.</em></h2>
       <p class="quote">
         "Tejer me lleva a las tardes con mi abuela. Quiero dejar una parte mía
-        en cada prenda."<br />— Lili
+        en cada prenda." <br />— Lili
       </p>
     </aside>
 
@@ -32,7 +33,7 @@ const action = next
       <div class="login-form">
         <a href="/" class="back-link">← Volver al sitio</a>
         <div class="eyebrow">— Acceso</div>
-        <h1>Ingresá<br />a tu cuenta</h1>
+        <h1>Ingresá <br />a tu cuenta</h1>
         <p class="lede">
           Para gestionar tu tienda, ver pedidos y métricas.
         </p>
@@ -54,6 +55,7 @@ const action = next
               id="login-email"
               type="email"
               name="email"
+              value={rememberedEmail}
               required
               autocomplete="email"
               placeholder="admin@betinadiluzio.com"
@@ -72,7 +74,7 @@ const action = next
           </div>
           <div class="form-row">
             <label class="remember">
-              <input type="checkbox" name="remember" /> Recordarme
+              <input type="checkbox" name="remember" checked={Boolean(rememberedEmail)} /> Recordarme
             </label>
           </div>
           <button type="submit"> Ingresar al panel </button>

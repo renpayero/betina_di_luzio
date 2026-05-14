@@ -5,6 +5,12 @@ import {
   WHATSAPP_DISPLAY,
   waLink,
 } from '../lib/constants.ts';
+import { getContent } from '../lib/content.ts';
+
+const tagline = await getContent(
+  'footer.tagline',
+  `Tejidos artesanales en crochet y dos agujas. Cada pieza es única, hecha a mano en ${BRAND.city}, ${BRAND.region} — desde ${BRAND.founded}.`
+);
 ---
 
 <footer class="footer" aria-labelledby="footer-heading">
@@ -14,10 +20,7 @@ import {
       <div class="footer-logo">
         Betina<em style="color:var(--terracota-200)">·</em>Di Luzio
       </div>
-      <p>
-        Tejidos artesanales en crochet y dos agujas. Cada pieza es única, hecha
-        a mano en {BRAND.city}, {BRAND.region} — desde {BRAND.founded}.
-      </p>
+      <p>{tagline}</p>
       <div class="footer-socials">
         <a href={SOCIAL.instagramUrl} target="_blank" rel="noopener" aria-label="Instagram">
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"

@@ -1,0 +1,18 @@
+---
+const url = Astro.url;
+const ok = url.searchParams.get('ok');
+const errMsg = url.searchParams.get('err');
+const msg = url.searchParams.get('msg');
+const has = ok || errMsg;
+const tone = ok ? 'ok' : 'err';
+const text = ok ? msg ?? 'Cambios guardados.' : errMsg ?? msg ?? 'Ocurrió un error.';
+---
+
+{
+  has && (
+    <div class:list={['flash', tone]} role="status" aria-live="polite">
+      <span>{text}</span>
+      <a href={url.pathname} aria-label="Cerrar">×</a>
+    </div>
+  )
+}

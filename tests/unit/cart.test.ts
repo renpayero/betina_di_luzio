@@ -65,6 +65,21 @@ describe('cart', () => {
     expect(cart.items()[0]?.qty).toBe(1);
   });
 
+  it('setQty respeta stock disponible (clamp superior)', async () => {
+    const { cart } = await loadCart();
+    cart.add({ id: 'p01', name: 'A', price: 100, placeholder: '', stock: 3, qty: 1 });
+    const [item] = cart.items();
+    cart.setQty(item!.key, 999);
+    expect(cart.items()[0]?.qty).toBe(3);
+  });
+
+  it('add: stock topa qty al sumarse a entry existente', async () => {
+    const { cart } = await loadCart();
+    cart.add({ id: 'p01', name: 'A', price: 100, placeholder: '', stock: 2, qty: 1 });
+    cart.add({ id: 'p01', name: 'A', price: 100, placeholder: '', stock: 2, qty: 5 });
+    expect(cart.items()[0]?.qty).toBe(2);
+  });
+
   it('count y total reflejan varios items con sus qty', async () => {
     const { cart } = await loadCart();
     cart.add({ id: 'p01', name: 'A', price: 100, placeholder: '', qty: 2 });

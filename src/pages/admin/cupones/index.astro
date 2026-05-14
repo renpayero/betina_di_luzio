@@ -1,0 +1,176 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import KpiCard from '../../../components/admin/KpiCard.astro';
+import Tag from '../../../components/admin/Tag.astro';
+import IconAction from '../../../components/admin/IconAction.astro';
+import { getCoupons, getCouponKpis, getCategories } from '../../../lib/queries.ts';
+import { fmtARS } from '../../../lib/format.ts';
+
+const [list, kpis, cats] = await Promise.all([
+  getCoupons(),
+  getCouponKpis(),
+  getCategories(),
+]);
+const catName = (id: string | null) => (id ? (cats.find((c) => c.id === id)?.name ?? id) : '—');
+
+const now = new Date();
+const fmtDate = (d: Date | null) =>
+  d
+    ? d.toLocaleDateString('es-AR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      })
+    : 'Sin venc.';
+
+const discountTotal = list.reduce((a, c) => {
+  if (c.kind === 'fixed') return a + c.usedCount * c.value;
+  return a;
+}, 0);
+---
+
+<AdminLayout title="Cupones · Promos" subtitle="Estimulá ventas con descuentos puntuales.">
+  <section class="kpis">
+    <KpiCard
+      label="Cupones activos"
+      count={kpis.active}
+      delta={`${list.length} totales`}
+      trend="up"
+    />
+    <KpiCard
+      label="Usos este mes"
+      count={kpis.usesThisMonth}
+      delta={`${kpis.totalUses} usos en total`}
+      trend="up"
+    />
+    <KpiCard
+      label="Descuento entregado"
+      count={discountTotal}
+      format="ars"
+      delta="Sólo cupones de monto fijo"
+    />
+    <KpiCard
+      label="Mejor cupón"
+      value={kpis.topByConv?.code ?? '—'}
+      delta={kpis.topByConv ? `${kpis.topByConv.usedCount} usos` : 'Sin datos'}
+      numStyle="font-size: 28px;"
+      trend="up"
+    />
+  </section>
+
+  <form class="toolbar">
+    <input
+      type="search"
+      placeholder="Buscar cupón por código, tipo o categoría…"
+      data-filter-rows
+      autocomplete="off"
+    />
+    <div class="right">
+      <span style="font-family:var(--mono); font-size:11px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.15em;">
+        {list.length} cupones · {list.filter((c) => c.isActive && (!c.expiresAt || c.expiresAt > now)).length} vigentes
+      </span>
+      <a href="/admin/cupones/nuevo" class="btn-add">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14" /></svg>
+        Nuevo cupón
+      </a>
+    </div>
+  </form>
+
+  <div class="panel" style="padding: 0;">
+    {
+      list.length === 0 ? (
+        <p style="padding:32px; color:var(--ink-soft); font-style:italic; text-align:center;">
+          Sin cupones. <a href="/admin/cupones/nuevo" style="color:var(--accent-deep);">Crear el primero →</a>
+        </p>
+      ) : (
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Tipo</th>
+              <th>Valor</th>
+              <th>Aplicación</th>
+              <th>Vencimiento</th>
+              <th>Usos</th>
+              <th>Estado</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {list.map((c) => {
+              const expired = c.expiresAt && c.expiresAt < now;
+              const active = c.isActive && !expired;
+              const stateTone: 'green' | 'gray' = active ? 'green' : 'gray';
+              const stateLabel = active
+                ? 'Activo'
+                : expired
+                  ? 'Vencido'
+                  : 'Pausado';
+              const valueStr =
+                c.kind === 'percent'
+                  ? `${c.value}%`
+                  : c.kind === 'fixed'
+                    ? fmtARS(c.value)
+                    : '—';
+              const kindLabel =
+                c.kind === 'percent'
+                  ? c.scope === 'all'
+                    ? '% sobre total'
+                    : c.scope === 'category'
+                      ? '% sobre cat.'
+                      : '% sobre productos'
+                  : c.kind === 'fixed'
+                    ? '$ fijo'
+                    : 'Envío';
+              const scopeLabel =
+                c.scope === 'all'
+                  ? c.minPurchase > 0
+                    ? `Compra mín. ${fmtARS(c.minPurchase)}`
+                    : 'Toda la tienda'
+                  : c.scope === 'category'
+                    ? `Categoría: ${catName(c.categoryId)}`
+                    : 'Productos seleccionados';
+              return (
+                <tr style={!active ? 'opacity:0.55;' : ''}>
+                  <td>
+                    <strong style="font-family:var(--mono); font-size:14px; letter-spacing:0.05em;">
+                      {c.code}
+                    </strong>
+                  </td>
+                  <td>{kindLabel}</td>
+                  <td>
+                    <strong>{valueStr}</strong>
+                  </td>
+                  <td>{scopeLabel}</td>
+                  <td>{fmtDate(c.expiresAt)}</td>
+                  <td>
+                    {c.usedCount} / {c.maxUses ?? '∞'}
+                  </td>
+                  <td>
+                    <Tag tone={stateTone}>{stateLabel}</Tag>
+                  </td>
+                  <td>
+                    <div class="actions-cell">
+                      <IconAction href={`/admin/cupones/${c.id}/editar`} title="Editar" icon="edit" />
+                      <form
+                        method="post"
+                        action={`/api/admin/cupones/${c.id}/eliminar`}
+                        style="display:inline;"
+                        data-confirm={`¿Eliminar el cupón ${c.code}?`}
+                        data-confirm-message="Esta acción no se puede deshacer."
+                        data-confirm-text="Eliminar"
+                        data-confirm-danger="true"
+                      >
+                        <IconAction type="submit" title="Eliminar" icon="delete" danger />
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      )
+    }
+  </div>
+</AdminLayout>

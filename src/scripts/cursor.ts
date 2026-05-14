@@ -24,6 +24,15 @@ const teardown = (): void => {
 };
 
 const mount = (): void => {
+  // Si el flag dice "montado" pero los nodos ya no existen (View Transitions
+  // reemplazó el body), reseteamos para permitir un nuevo mount.
+  if (mounted && !document.querySelector('.cursor-yarn')) {
+    if (rafId !== null) cancelAnimationFrame(rafId);
+    rafId = null;
+    cleanup?.();
+    cleanup = null;
+    mounted = false;
+  }
   if (mounted) return;
   mounted = true;
 
@@ -106,4 +115,14 @@ if (typeof window !== 'undefined') {
   const onChange = () => initCursor();
   reducedMq.addEventListener?.('change', onChange);
   coarseMq.addEventListener?.('change', onChange);
+
+  // Antes de un swap de View Transitions, liberamos listeners y rafId.
+  // No tocamos los nodos: Astro reemplazará el <body> entero.
+  document.addEventListener('astro:before-swap', () => {
+    if (rafId !== null) cancelAnimationFrame(rafId);
+    rafId = null;
+    cleanup?.();
+    cleanup = null;
+    mounted = false;
+  });
 }

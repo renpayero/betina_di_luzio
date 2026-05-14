@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Contacto · Betina Di Luzio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+<style>
+.contact-hero { padding: 160px 0 60px; text-align: center; }
+.contact-hero h1 { font-size: var(--t-h1); margin-top: 16px;}
+.contact-hero h1 em { font-style: italic; color: var(--accent-deep);}
+.contact-hero p { font-family: var(--serif); font-style: italic; font-size: 22px; color: var(--ink-soft); margin-top: 16px;}
+.contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; max-width: 1200px; margin: 0 auto; padding: 60px var(--s-7) 120px;}
+.contact-side h3 { font-family: var(--serif); font-size: 36px; margin-bottom: 24px;}
+.contact-channels { list-style: none; display: flex; flex-direction: column; gap: 0;}
+.contact-channels li { padding: 24px 0; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 20px; transition: padding-left 0.3s;}
+.contact-channels li:hover { padding-left: 8px; }
+.contact-channels .ico { width: 48px; height: 48px; border-radius: 50%; background: var(--bg-warm); display: flex; align-items: center; justify-content: center; flex-shrink: 0;}
+.contact-channels .ico svg { width: 18px; height: 18px; fill: var(--accent-deep);}
+.contact-channels .label { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.18em; color: var(--ink-soft); margin-bottom: 4px;}
+.contact-channels .value { font-family: var(--serif); font-size: 22px;}
+.contact-channels a { display: block; }
+.contact-form { padding: 48px; background: var(--bg-warm); border-radius: 4px; }
+.contact-form .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;}
+.contact-form .field { margin-bottom: 16px; }
+.contact-form .submit { display: flex; gap: 12px; align-items: center; margin-top: 16px;}
+.contact-form .small-print { font-size: 13px; color: var(--ink-soft); margin-top: 16px;}
+.faq { background: var(--bg-warm); padding: var(--s-9) 0; }
+.faq-list { max-width: 880px; margin: 0 auto; padding: 0 var(--s-7);}
+.faq-item { border-bottom: 1px solid var(--line); }
+.faq-q { padding: 28px 0; display: flex; justify-content: space-between; align-items: center; cursor: none; font-family: var(--serif); font-size: 24px; transition: color 0.3s;}
+.faq-q:hover { color: var(--accent-deep); }
+.faq-q .plus { font-family: var(--mono); transition: transform 0.4s; color: var(--accent);}
+.faq-item.open .faq-q .plus { transform: rotate(45deg);}
+.faq-a { max-height: 0; overflow: hidden; transition: max-height 0.5s cubic-bezier(0.22,1,0.36,1); color: var(--ink-soft); line-height: 1.8; }
+.faq-item.open .faq-a { max-height: 280px; padding: 0 0 28px;}
+@media (max-width: 800px) { .contact-grid { grid-template-columns: 1fr; gap: 40px; padding: 40px 20px 80px;} .contact-form { padding: 28px;} }
+</style>
+</head>
+<body>
+<div data-include="nav"></div>
+
+<section class="contact-hero">
+  <div class="eyebrow reveal">— Contacto</div>
+  <h1 class="serif reveal reveal-delay-1">Hablemos del tejido<br/>que <em>imaginás.</em></h1>
+  <p class="reveal reveal-delay-2">Respondo personalmente todos los mensajes. Suelo contestar el mismo día.</p>
+</section>
+
+<div class="contact-grid">
+  <div class="contact-side reveal">
+    <h3 class="serif">Encontrame en</h3>
+    <ul class="contact-channels">
+      <li>
+        <div class="ico"><svg viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 0 1 8.413 3.488 11.824 11.824 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24z"/></svg></div>
+        <a href="https://wa.me/5493413003417" target="_blank">
+          <div class="label">WhatsApp · Lo más rápido</div>
+          <div class="value">+54 9 341 300-3417</div>
+        </a>
+      </li>
+      <li>
+        <div class="ico"><svg viewBox="0 0 24 24"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41-.56-.22-.96-.48-1.38-.9-.42-.42-.68-.82-.9-1.38-.16-.42-.36-1.06-.41-2.23C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16M12 0C8.74 0 8.33.01 7.05.07 5.78.13 4.9.33 4.14.63c-.78.3-1.45.71-2.12 1.38C1.35 2.68.94 3.35.64 4.14c-.3.75-.5 1.63-.56 2.91C.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.06 1.27.26 2.15.56 2.91.3.78.71 1.45 1.38 2.12.67.67 1.34 1.08 2.12 1.38.76.3 1.64.5 2.91.56C8.33 23.99 8.74 24 12 24s3.67-.01 4.95-.07c1.27-.06 2.15-.26 2.91-.56.78-.3 1.45-.71 2.12-1.38.67-.67 1.08-1.34 1.38-2.12.3-.76.5-1.64.56-2.91.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.06-1.27-.26-2.15-.56-2.91-.3-.78-.71-1.45-1.38-2.12C21.32 1.35 20.65.94 19.86.64c-.76-.3-1.64-.5-2.91-.56C15.67.01 15.26 0 12 0zm0 5.84A6.16 6.16 0 1 0 18.16 12 6.16 6.16 0 0 0 12 5.84zm0 10.16A4 4 0 1 1 16 12a4 4 0 0 1-4 4z"/></svg></div>
+        <a href="https://www.instagram.com/betina_di_luzio" target="_blank">
+          <div class="label">Instagram · DM</div>
+          <div class="value">@betina_di_luzio</div>
+        </a>
+      </li>
+      <li>
+        <div class="ico"><svg viewBox="0 0 24 24"><path d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6zm-2 0l-8 5-8-5h16zm0 12H4V8l8 5 8-5v10z"/></svg></div>
+        <a href="mailto:hola@betinadiluzio.com">
+          <div class="label">Email · Para pedidos formales</div>
+          <div class="value">hola@betinadiluzio.com</div>
+        </a>
+      </li>
+      <li>
+        <div class="ico"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg></div>
+        <div>
+          <div class="label">Taller</div>
+          <div class="value">Rosario, Santa Fe · Visitas con cita</div>
+        </div>
+      </li>
+    </ul>
+
+    <div style="margin-top: 48px; padding: 24px; border: 1px solid var(--line); border-radius: 4px; background: var(--bg-card);">
+      <div class="eyebrow" style="margin-bottom: 8px;">Horario de respuesta</div>
+      <p style="font-family: var(--serif); font-size: 18px;">Lun a Vie · 9:00 — 19:00 hs<br/>Sábados · 10:00 — 14:00 hs</p>
+    </div>
+  </div>
+
+  <form class="contact-form reveal reveal-delay-1" onsubmit="event.preventDefault(); this.querySelector('.btn').textContent='✓ Mensaje enviado'; this.querySelector('.btn').style.background='var(--accent-olive)';">
+    <h3 class="serif" style="font-size: 28px; margin-bottom: 24px;">Contame qué buscás</h3>
+    <div class="field-row">
+      <div class="field"><label>Nombre</label><input type="text" required placeholder="Cómo te llamás" /></div>
+      <div class="field"><label>Email o WhatsApp</label><input type="text" required placeholder="hola@..." /></div>
+    </div>
+    <div class="field"><label>Tipo de pedido</label>
+      <select>
+        <option>Consulta general</option>
+        <option>Pedido a medida</option>
+        <option>Regalo</option>
+        <option>Mayorista / tiendas</option>
+      </select>
+    </div>
+    <div class="field"><label>Tu mensaje</label><textarea required placeholder="Contame qué imaginás — color, talle, fecha..."></textarea></div>
+    <div class="submit">
+      <button type="submit" class="btn btn-primary">Enviar mensaje
+        <svg class="arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+    <p class="small-print">Respondemos en menos de 24 hs hábiles.</p>
+  </form>
+</div>
+
+<section class="faq">
+  <div class="container" style="max-width: 880px;">
+    <div class="section-head" style="grid-template-columns: 1fr; text-align: center; margin-bottom: 48px;">
+      <div>
+        <div class="eyebrow reveal">— Preguntas frecuentes</div>
+        <h2 class="serif reveal reveal-delay-1" style="margin-top: 16px;">Lo que más nos preguntan.</h2>
+      </div>
+    </div>
+  </div>
+  <div class="faq-list">
+    <div class="faq-item"><div class="faq-q">¿Cuánto tarda un pedido a medida? <span class="plus">+</span></div><div class="faq-a">Entre 2 y 6 semanas, según la complejidad y los materiales. Para fechas especiales (cumpleaños, baby showers) coordinamos al inicio para llegar a tiempo.</div></div>
+    <div class="faq-item"><div class="faq-q">¿Hacen envíos a todo el país? <span class="plus">+</span></div><div class="faq-a">Sí. Coordinamos por WhatsApp el método (Correo Argentino, Andreani, OCA) y el costo según destino. En Rosario podés retirar sin cargo.</div></div>
+    <div class="faq-item"><div class="faq-q">¿Qué medios de pago aceptan? <span class="plus">+</span></div><div class="faq-a">Por ahora coordinamos pago por WhatsApp — transferencia bancaria, Mercado Pago o efectivo. Para pedidos a medida pedimos seña del 50%.</div></div>
+    <div class="faq-item"><div class="faq-q">¿Puedo elegir colores fuera del catálogo? <span class="plus">+</span></div><div class="faq-a">¡Por supuesto! Trabajamos con varios proveedores de hilados. Mandame una referencia (foto, paleta) y te paso opciones disponibles.</div></div>
+    <div class="faq-item"><div class="faq-q">¿Cómo cuido mi prenda tejida? <span class="plus">+</span></div><div class="faq-a">Cada prenda viaja con instrucciones específicas. En general: lavado a mano con agua tibia, secado en plano. Tenés más detalles en la sección <a href="cuidados.html" style="text-decoration: underline;">Cuidados</a>.</div></div>
+  </div>
+</section>
+
+<div data-include="footer"></div>
+
+<script src="assets/data.js"></script>
+<script src="assets/shared.js"></script>
+<script src="assets/layout.js"></script>
+<script>
+window.BDLLayout.mount('contacto');
+document.querySelectorAll('.faq-q').forEach(q => {
+  q.addEventListener('click', () => q.parentElement.classList.toggle('open'));
+});
+</script>
+</body>
+</html>

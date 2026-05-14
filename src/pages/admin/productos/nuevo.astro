@@ -1,0 +1,15 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import ProductForm from '../../../components/admin/ProductForm.astro';
+import { getCategories } from '../../../lib/queries.ts';
+
+const cats = await getCategories();
+---
+
+<AdminLayout title="Nuevo producto" subtitle="Sumá una pieza al catálogo.">
+  <ProductForm
+    action="/api/admin/productos/crear"
+    cats={cats}
+    submitLabel="Crear producto"
+  />
+</AdminLayout>

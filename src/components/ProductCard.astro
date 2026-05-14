@@ -4,12 +4,13 @@ import { fmtARS } from '../lib/format.ts';
 import PlaceholderImg from './PlaceholderImg.astro';
 
 interface Props {
-  product: Product;
+  product: Product & { heroImage?: string | null };
   showQuick?: boolean;
   delay?: 0 | 1 | 2 | 3;
 }
 
 const { product: p, showQuick = false, delay } = Astro.props;
+const heroUrl = p.heroImage && p.heroImage.startsWith('/uploads/') ? p.heroImage : null;
 const badgeText =
   p.status === 'new'
     ? 'Nuevo'
@@ -37,7 +38,11 @@ const revealClass =
         ></path></svg
       >
     </button>
-    <PlaceholderImg label={p.placeholder} />
+    {heroUrl ? (
+      <img src={heroUrl} alt={p.name} loading="lazy" decoding="async" class="product-card-img" />
+    ) : (
+      <PlaceholderImg label={p.placeholder} />
+    )}
     {
       showQuick && (
         <button class="quick" type="button">
