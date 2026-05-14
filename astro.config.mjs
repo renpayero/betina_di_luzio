@@ -7,6 +7,10 @@ export default defineConfig({
   adapter: node({ mode: 'standalone' }),
   site: process.env.SITE_URL ?? 'https://betinadiluzio.com',
   trailingSlash: 'never',
+  // CSRF: usamos nuestro check en src/lib/csrf.ts (compara hostnames, no
+  // protocolo). El built-in de Astro compara contra url.origin que detrás
+  // de un proxy HTTP→HTTPS termina siendo http:// y falla. Ver login.ts.
+  security: { checkOrigin: false },
   prefetch: {
     defaultStrategy: 'viewport',
     prefetchAll: false,

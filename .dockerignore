@@ -1,0 +1,16 @@
+node_modules
+dist
+.astro
+.git
+.github
+.env
+.env.local
+.env.production
+.DS_Store
+npm-debug.log*
+*.tsbuildinfo
+.vscode
+tests
+qa-report.md
+_design-reference
+public/uploads

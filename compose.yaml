@@ -4,19 +4,53 @@ services:
     container_name: betina_db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: betina
-      POSTGRES_USER: betina
-      POSTGRES_PASSWORD: betina_dev
+      POSTGRES_DB: ${POSTGRES_DB:-betina}
+      POSTGRES_USER: ${POSTGRES_USER:-betina}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-betina_dev}
+    # Solo bind a localhost del VPS — postgres NO expuesto a internet.
+    # Comentar la sección entera si no querés acceso desde el host.
     ports:
-      - "5435:5432"
+      - "127.0.0.1:5435:5432"
     volumes:
       - betina_pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U betina -d betina"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-betina} -d ${POSTGRES_DB:-betina}"]
       interval: 5s
       timeout: 3s
       retries: 12
       start_period: 5s
 
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: betina_app
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      HOST: 0.0.0.0
+      PORT: 4321
+      NODE_ENV: production
+    # Bind a localhost para debug directo desde el VPS; NPM resuelve por
+    # nombre de contenedor en la red nginx_default, no necesita este puerto.
+    ports:
+      - "127.0.0.1:4321:4321"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      # Imágenes subidas desde el admin — persisten fuera del contenedor
+      - ./public/uploads:/app/public/uploads
+    networks:
+      - default
+      - nginx
+
 volumes:
   betina_pgdata:
+    name: betina_pgdata
+
+networks:
+  default:
+  nginx:
+    name: nginx_default
+    external: true
