@@ -311,6 +311,21 @@ const SIZES = [
     position: sticky;
     top: 100px;
     align-self: flex-start;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+    padding-right: 8px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--line) transparent;
+  }
+  .filters::-webkit-scrollbar {
+    width: 6px;
+  }
+  .filters::-webkit-scrollbar-thumb {
+    background: var(--line);
+    border-radius: 3px;
+  }
+  .filters::-webkit-scrollbar-thumb:hover {
+    background: var(--ink-mute);
   }
   .filter-group {
     margin-bottom: 36px;

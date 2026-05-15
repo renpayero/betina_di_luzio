@@ -98,3 +98,30 @@ const isActive = (key: NonNullable<Props['active']>) =>
   </div>
 </nav>
 <MobileMenu active={active} />
+
+<script>
+  const isActiveFor = (href: string, path: string): boolean => {
+    if (href === '/') return path === '/';
+    if (href === '/tienda')
+      return (
+        path === '/tienda' ||
+        path.startsWith('/tienda/') ||
+        path.startsWith('/producto/')
+      );
+    return path === href || path.startsWith(href + '/');
+  };
+
+  const syncActiveNav = (): void => {
+    const path = window.location.pathname;
+    document
+      .querySelectorAll<HTMLAnchorElement>('.nav-links a, .icon-btn[href]')
+      .forEach((a) => {
+        const href = a.getAttribute('href') ?? '';
+        if (isActiveFor(href, path)) a.setAttribute('aria-current', 'page');
+        else a.removeAttribute('aria-current');
+      });
+  };
+
+  syncActiveNav();
+  document.addEventListener('astro:page-load', syncActiveNav);
+</script>
